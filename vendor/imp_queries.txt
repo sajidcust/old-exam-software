@@ -1,0 +1,115 @@
+Group Wise Provincial Division Query
+
+<------------ Query For Quality Points ---------------------->
+
+SELECT u.id, u.name, saq.total_marks, saq.qualification_id, aq.qualification_name, pcpq.division_percentage, saq.obtained_marks, saq.percentage_marks, SUM((saq.obtained_marks/saq.total_marks)*pcpq.division_percentage) As quality_points
+FROM users as u
+JOIN student_academic_qualifications saq
+ON saq.student_id = u.id
+JOIN academic_qualifications aq
+ON aq.id = saq.qualification_id
+JOIN nominations as n
+on n.id = saq.nomination_id
+LEFT JOIN provinces_cc_pre_qualifications as pcpq
+ON pcpq.course_category_id = n.course_category_id AND pcpq.qualification_id = saq.qualification_id
+GROUP BY u.id, saq.qualification_id;
+
+<------------ Query For Aggregate Marks ---------------------->
+
+SELECT u.*, 
+SUM((saq.obtained_marks/saq.total_marks)*pcpq.division_percentage) As aggregate_marks
+FROM users as u
+JOIN student_academic_qualifications saq
+ON saq.student_id = u.id
+JOIN academic_qualifications aq
+ON aq.id = saq.qualification_id
+JOIN nominations as n
+on n.id = saq.nomination_id
+LEFT JOIN provinces_cc_pre_qualifications as pcpq
+ON pcpq.course_category_id = n.course_category_id AND pcpq.qualification_id = saq.qualification_id
+GROUP BY u.id
+ORDER BY aggregate_marks DESC;
+
+
+<---------------------- New Update Aggregate ----------------------------->
+
+SELECT u.id, u.name, saq.qualification_id, aq.qualification_name, pcpq.division_percentage, saq.total_marks, saq.obtained_marks, saq.percentage_marks, 
+SUM((saq.obtained_marks/saq.total_marks)*pcpq.division_percentage) AS aggregate_marks
+FROM users as u
+JOIN student_academic_qualifications saq
+ON saq.student_id = u.id
+JOIN academic_qualifications aq
+ON aq.id = saq.qualification_id
+JOIN nominations as n
+on n.id = saq.nomination_id
+JOIN students_nominations sn
+ON sn.nomination_id = n.id AND sn.student_id = u.id
+JOIN provinces_cc_pre_qualifications as pcpq
+ON pcpq.course_category_id = n.course_category_id AND pcpq.qualification_id = saq.qualification_id
+WHERE n.id = 1 AND sn.is_completed = 1 AND sn.is_verified = 1
+GROUP BY u.id
+ORDER BY aggregate_marks DESC;
+
+
+
+public function submitacademicinfo($id)
+    {
+        if(Nomination::isVerified($id, auth()->user()->id)){
+            return Redirect::to('students/index')
+                ->with('message', 'Access Denied! You are not allowed to perform this operation.');
+        }
+
+        $nomination = Nomination::find($id);
+        $this->selected_sub_menu = "students_academicinfo";
+        $this->card_title = "Fill in the form shown below to complete academic details for ". $nomination->nomination_title;
+
+        $countStudentPrequals = StudentAcademicQualification::where('nomination_id', '=', $id)->where('student_id', auth()->user()->id)->count();
+        
+        if($countStudentPrequals > 0){
+            $prequalifications = NominationPrequalification::getPrequalificationsByStudents($nomination->id, auth()->user()->id);
+        } else {
+            $prequalifications = NominationPrequalification::join('academic_qualifications', 'academic_qualifications.id', '=', 'nomination_prequalifications.qualification_id')->where('nomination_prequalifications.nomination_id', $nomination->id)->get([
+                    'nomination_prequalifications.qualification_id', 'academic_qualifications.qualification_name', 'nomination_prequalifications.is_skippable', 'nomination_prequalifications.min_passing_percentage', 'nomination_prequalifications.nomination_id']);
+        }
+
+        return view('students.academicinfo')
+            ->with('nomination_id', $nomination->id)
+            ->with('prequalifications', $prequalifications)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu);
+    }
+
+
+
+
+
+
+public static function getPrequalificationsByStudents($nomination_id, $student_id) {
+        $prequalifications = DB::select(
+            DB::raw("
+                SELECT nomination_prequalifications.qualification_id, 
+                    academic_qualifications.qualification_name, 
+                    nomination_prequalifications.is_skippable, 
+                    nomination_prequalifications.min_passing_percentage, 
+                    student_academic_qualifications.last_institute, 
+                    student_academic_qualifications.board_name, 
+                    student_academic_qualifications.passing_year, 
+                    student_academic_qualifications.total_marks, 
+                    student_academic_qualifications.obtained_marks, 
+                    student_academic_qualifications.percentage_marks
+                FROM nomination_prequalifications
+                INNER JOIN student_academic_qualifications
+                ON nomination_prequalifications.qualification_id = student_academic_qualifications.qualification_id
+                JOIN academic_qualifications
+                ON academic_qualifications.id = student_academic_qualifications.qualification_id
+                WHERE nomination_prequalifications.nomination_id = ". $nomination_id ."
+                AND student_academic_qualifications.student_id = ". $student_id ."
+                AND student_academic_qualifications.nomination_id = ". $nomination_id .";
+            ")
+        );
+
+        return $prequalifications;
+    }
