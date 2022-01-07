@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 use DB;
+use Excel;
 
 class AdminController extends Controller
 {
@@ -23,6 +24,96 @@ class AdminController extends Controller
      */
     public function index()
     {
+
+        $array = Excel::toArray([], storage_path('imports/centers_data_ghizer.xlsx'));
+
+        //$theArray = Excel::toArray([], 'myexcelfile.xlsx');
+        $new_array = array();
+        $index = 0;
+        foreach($array[0] as $arr){
+            $new_array[$index]['id'] = (int)(trim($arr[0]));
+            $new_array[$index]['center_name'] = strtolower(str_replace(' ', '_', trim($arr[1])));
+            $new_array[$index]['institute_name'] = strtolower(str_replace(' ', '_', trim($arr[2])));
+            $index++;
+        }
+
+        //dd($new_array);
+
+        $input = array_map("unserialize", array_unique(array_map("serialize", $new_array)));
+
+        //dd($input);
+
+
+        $ids_array = array();
+        $j=0;
+
+        foreach($input as $inp) {
+            $ids_array[$j] = $inp['id'];
+            $j++;
+        }
+
+        $unique_ids = array_unique($ids_array);
+
+        $i=1;
+        $failed_array = array();
+        $counter = 0;
+        $first_value = false;
+
+        foreach($unique_ids as $inp){
+            $first_value = false;
+            foreach($input as $inp2){
+                if($inp == $inp2['id']) {
+                    if($inp2['center_name'] == $inp2['institute_name']) {
+                        $first_value = true;
+                    }
+
+                    if($first_value) {
+                        echo "<h4>";
+                        echo $i."-".$inp2['id'].":". strtoupper(str_replace('_', ' ', $inp2['center_name']))."-<span style='color:red'>".strtoupper(str_replace('_', ' ', $inp2['institute_name']))."</span>";
+                        echo "</h4>";
+                    } 
+                    if(!$first_value) {
+                        $failed_array[$counter]['id'] = $inp2['id'];
+                        $failed_array[$counter]['center_name'] = $inp2['center_name'];
+                        $failed_array[$counter]['institute_name'] = $inp2['institute_name'];
+                        $counter++;
+                    }
+                }
+            }
+            $counter++;
+            $i++;
+        }
+        
+        //foreach($input as $inp){
+
+            /*if($inp['center_name'] == $inp['institute_name']){
+                echo "<h1>".$inp['center_name']."::::".$inp['institute_name']."</h1>";
+                $first_value = true;
+            }
+
+            if($inp['center_name'] != $inp['institute_name']) {
+                $first_value = false;
+            }*/
+
+            /*if($first_value){
+                echo "<h4>";
+                echo $i."-".$inp['id'].":". strtoupper(str_replace('_', ' ', $inp['center_name']))."-<span style='color:red'>".strtoupper(str_replace('_', ' ', $inp['institute_name']))."</span>";
+                echo "</h1>";
+            } else {
+                $failed_array[$counter]['id'] = $inp['id'];
+                $failed_array[$counter]['center_name'] = $inp['center_name'];
+                $failed_array[$counter]['institute_name'] = $inp['institute_name'];
+                $counter++;
+            }
+            $i++;*/
+        //}
+
+        dd($failed_array);
+
+        exit;
+
+        dd($input);
+        echo "here";exit;
 
         //$database = DB::connection()->getPdo();
         //$driver_name = DB::connection()->getDriverName();

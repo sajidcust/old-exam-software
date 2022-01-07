@@ -18,10 +18,13 @@ use App\Models\Fee;
 use App\Models\Session;
 use App\Models\Semester;
 use App\Models\Subject;
+use App\Models\SubjectsGroup;
 use App\Models\Standard;
 use App\Models\Bank;
 use App\Models\StudentsFee;
 use App\Models\StudentsFeesSelection;
+use App\Models\Setting;
+use App\Models\District;
 use Faker;
 
 class DatabaseSeeder extends Seeder
@@ -42,17 +45,327 @@ class DatabaseSeeder extends Seeder
 
         $user1 = new User;
         $user1->name = 'User';
-        $user1->email = 'dataentry@beeg@gov.pk';
+        $user1->email = 'dataentry@beeg.gov.pk';
         $user1->password = Hash::make('password123');
         $user1->user_role = 3;
         $user1->save();
 
         $user2 = new User;
         $user2->name = 'User';
-        $user2->email = 'assesmentcenter@beeg@gov.pk';
+        $user2->email = 'assesmentcenter@beeg.gov.pk';
         $user2->password = Hash::make('password123');
         $user2->user_role = 3;
         $user2->save();
+
+        $setting = new Setting;
+        $setting->id = 1;
+        $setting->board_full_name = "Board Of Elementary Examination, Gilgit Division";
+        $setting->minister_name = "Mohammad Azam Khan";
+        $setting->minister_image = "/images/1640182853-orig-minister-image.png";
+        $setting->ministers_message = '<table style="height: 107px; width: 100%; border-collapse: collapse; border-style: none;" border="1">
+        <tbody>
+        <tr style="height: 50px;">
+        <td style="width: 100%; height: 50px; border-style: none; text-align: center;"><strong>(FROM THE HONORABLE MR. RAJA AZAM KHAN MINISTER EDUCATION GILGIT BALTISTAN)</strong></td>
+        </tr>
+        <tr style="height: 18px;">
+        <td style="width: 100%; height: 18px; border-style: none; text-align: center;">
+        <p>Quality education is an essential tool for any nation to achieve progress and success. It develops confidence and helps to build the entire nation. Hence, in acheiving this goal, school education plays a key role in nations life. Education is a dire need for both men and women. Furthermore, educated and trained people can contribute effectively to construct a developed and enlightened society. Consequently, the nurtured and responsible citizens of the society build the future of the country. Moreover, the quality education makes people perfect and nobel.</p>
+        <p>&nbsp; &nbsp; &nbsp;It is an immense pleasure to see the progress of the government schools of Gilgit-Baltistan. The government schools always put forward their tremendous effort in nation building.</p>
+        <p>&nbsp; &nbsp; May Allah almighty bestow us strength and will to carry this great mission of spreading the light of education.</p>
+        </td>
+        </tr>
+        </tbody>
+        </table>';
+        $setting->secretary_name = 'Iqbal Hussain';
+        $setting->secretary_image = '/images/1640182853-orig-secretary-image.png';
+        $setting->secretarys_message = '<table style="height: 107px; width: 100%; border-collapse: collapse; border-style: none;" border="1">
+        <tbody>
+        <tr style="height: 50px;">
+        <td style="width: 100%; height: 50px; border-style: none; text-align: center;"><strong>(FROM THE HONORABLE MR. IQBAL HUSSAIN SECRETARY EDUCATION GILGIT BALTISTAN)</strong></td>
+        </tr>
+        <tr style="height: 18px;">
+        <td style="width: 100%; height: 18px; border-style: none; text-align: center;">
+        <p>Quality education is an essential tool for any nation to achieve progress and success. It develops confidence and helps to build the entire nation. Hence, in acheiving this goal, school education plays a key role in nations life. Education is a dire need for both men and women. Furthermore, educated and trained people can contribute effectively to construct a developed and enlightened society. Consequently, the nurtured and responsible citizens of the society build the future of the country. Moreover, the quality education makes people perfect and nobel.</p>
+        <p>&nbsp; &nbsp; &nbsp;It is an immense pleasure to see the progress of the government schools of Gilgit-Baltistan. The government schools always put forward their tremendous effort in nation building.</p>
+        <p>&nbsp; &nbsp; May Allah almighty bestow us strength and will to carry this great mission of spreading the light of education.</p>
+        </td>
+        </tr>
+        </tbody>
+        </table>';
+        $setting->controller_name = 'Abdul Hamid';
+        $setting->controller_image = '/images/1640182853-orig-controller-image.png';
+        $setting->controllers_message = '<table style="height: 107px; width: 100%; border-collapse: collapse; border-style: none;" border="1">
+        <tbody>
+        <tr style="height: 50px;">
+        <td style="width: 100%; height: 50px; border-style: none; text-align: center;"><strong>(FROM THE HONORABLE MR. ABDUL HAMID CONTROLLER EXAMINATION / DIRECTOR ACADEMICS EDUCATION GILGIT BALTISTAN)</strong></td>
+        </tr>
+        <tr style="height: 18px;">
+        <td style="width: 100%; height: 18px; border-style: none; text-align: center;">
+        <p>Quality education is an essential tool for any nation to achieve progress and success. It develops confidence and helps to build the entire nation. Hence, in acheiving this goal, school education plays a key role in nations life. Education is a dire need for both men and women. Furthermore, educated and trained people can contribute effectively to construct a developed and enlightened society. Consequently, the nurtured and responsible citizens of the society build the future of the country. Moreover, the quality education makes people perfect and nobel.</p>
+        <p>&nbsp; &nbsp; &nbsp;It is an immense pleasure to see the progress of the government schools of Gilgit-Baltistan. The government schools always put forward their tremendous effort in nation building.</p>
+        <p>&nbsp; &nbsp; May Allah almighty bestow us strength and will to carry this great mission of spreading the light of education.</p>
+        </td>
+        </tr>
+        </tbody>
+        </table>';
+        $setting->deputy_controller_name = 'Hashim Ali';
+        $setting->save();
+
+        $standard = new Standard;
+        $standard->id = 1001;
+        $standard->name = '5th';
+        $standard->min_subjects = 6;
+        $standard->min_age = 9;
+        $standard->save();
+
+        $standard1 = new Standard;
+        $standard1->name = '8th';
+        $standard1->min_subjects = 8;
+        $standard1->min_age = 12;
+        $standard1->save();
+
+        $bank = new Bank;
+        $bank->id = 1001;
+        $bank->name = 'KCBL';
+        $bank->save();
+
+        $bank2 = new Bank;
+        $bank2->name = 'Faisal Bank';
+        $bank2->save();
+
+        $district = new District;
+        $district->id = 1001;
+        $district->name = 'Gilgit';
+        $district->save();
+
+        $district1 = new District;
+        $district1->name = 'Ghizer';
+        $district1->save();
+
+        $district2 = new District;
+        $district2->name = 'Nagar';
+        $district2->save();
+
+        $district3 = new District;
+        $district3->name = 'Hunza';
+        $district3->save();
+
+        $tehsil = new Tehsil;
+        $tehsil->id = 1001;
+        $tehsil->name = 'Gilgit';
+        $tehsil->district_id = 1001;
+        $tehsil->save();
+
+        $tehsil1 = new Tehsil;
+        $tehsil1->name = 'Ghizer';
+        $tehsil1->district_id = 1002;
+        $tehsil1->save();
+
+        $tehsil2 = new Tehsil;
+        $tehsil2->name = 'Nagar';
+        $tehsil2->district_id = 1003;
+        $tehsil2->save();
+
+        $tehsil3 = new Tehsil;
+        $tehsil3->name = 'Hunza';
+        $tehsil3->district_id = 1004;
+        $tehsil3->save();
+
+        $fee = new Fee;
+        $fee->id = 1001;
+        $fee->title = 'Registration Fee';
+        $fee->amount = 100;
+        $fee->save();
+
+        $fee1 = new Fee;
+        $fee1->title = 'Marksheet Fee';
+        $fee1->amount = 100;
+        $fee1->save();
+
+        $fee2 = new Fee;
+        $fee2->title = 'Examination Fee (5th) (Regular)';
+        $fee2->amount = 250;
+        $fee2->save();
+
+        $fee3 = new Fee;
+        $fee3->title = 'Examination Fee (5th) (Private)';
+        $fee3->amount = 600;
+        $fee3->save();
+
+        $fee4 = new Fee;
+        $fee4->title = 'Examination Fee (8th) (Regular)';
+        $fee4->amount = 350;
+        $fee4->save();
+
+        $fee5 = new Fee;
+        $fee5->title = 'Examination Fee (8th) (Private)';
+        $fee5->amount = 800;
+        $fee5->save();
+
+        $fee6 = new Fee;
+        $fee6->title = 'Late Fee (5th)';
+        $fee6->amount = 150;
+        $fee6->save();
+
+        $fee7 = new Fee;
+        $fee7->title = 'Double Late Fee (5th)';
+        $fee7->amount = 300;
+        $fee7->save();
+
+        $fee8 = new Fee;
+        $fee8->title = 'Late Fee (8th)';
+        $fee8->amount = 200;
+        $fee8->save();
+
+        $fee9 = new Fee;
+        $fee9->title = 'Double Late Fee (8th)';
+        $fee9->amount = 400;
+        $fee9->save();
+
+        $subject = new Subject;
+        $subject->id = 1001;
+        $subject->name = 'English';
+        $subject->short_name = 'ENG';
+        $subject->is_optional = 0;
+        $subject->has_practical = 0;
+        $subject->save();
+
+        $subject1 = new Subject;
+        $subject1->name = 'Urdu';
+        $subject1->short_name = 'URD';
+        $subject1->is_optional = 0;
+        $subject1->has_practical = 0;
+        $subject1->save();
+
+        $subject2 = new Subject;
+        $subject2->name = 'Mathematics';
+        $subject2->short_name = 'MTH';
+        $subject2->is_optional = 0;
+        $subject2->has_practical = 0;
+        $subject2->save();
+
+        $subject3 = new Subject;
+        $subject3->name = 'Islamiat';
+        $subject3->short_name = 'ISL';
+        $subject3->is_optional = 0;
+        $subject3->has_practical = 1;
+        $subject3->save();
+
+        $subject4 = new Subject;
+        $subject4->name = 'General Science';
+        $subject4->short_name = 'GSC';
+        $subject4->is_optional = 0;
+        $subject4->has_practical = 0;
+        $subject4->save();
+
+        $subject5 = new Subject;
+        $subject5->name = 'Social Studies';
+        $subject5->short_name = 'SST';
+        $subject5->is_optional = 0;
+        $subject5->has_practical = 0;
+        $subject5->save();
+
+        $subject6 = new Subject;
+        $subject6->name = 'History And Geography';
+        $subject6->short_name = 'HAG';
+        $subject6->is_optional = 0;
+        $subject6->has_practical = 0;
+        $subject6->save();
+
+        $subject7 = new Subject;
+        $subject7->name = 'Drawing';
+        $subject7->short_name = 'DRW';
+        $subject7->is_optional = 1;
+        $subject7->has_practical = 0;
+        $subject7->save();
+
+        $subject8 = new Subject;
+        $subject8->name = 'Computer';
+        $subject8->short_name = 'CMP';
+        $subject8->is_optional = 1;
+        $subject8->has_practical = 1;
+        $subject8->save();
+
+        $subject9 = new Subject;
+        $subject9->name = 'Home Economics';
+        $subject9->short_name = 'HEC';
+        $subject9->is_optional = 1;
+        $subject9->has_practical = 1;
+        $subject9->save();
+
+        $subject10 = new Subject;
+        $subject10->name = 'Agriculture';
+        $subject10->short_name = 'AGR';
+        $subject10->is_optional = 1;
+        $subject10->has_practical = 0;
+        $subject10->save();
+
+        $subject11 = new Subject;
+        $subject11->name = 'Arabic';
+        $subject11->short_name = 'ARB';
+        $subject11->is_optional = 1;
+        $subject11->has_practical = 0;
+        $subject11->save();
+
+        $subjectgroup = new SubjectsGroup;
+        $subjectgroup->subject_id = 1001;
+        $subjectgroup->class_id = 1001;
+        $subjectgroup->save();
+
+        $subjectgroup1 = new SubjectsGroup;
+        $subjectgroup1->subject_id = 1002;
+        $subjectgroup1->class_id = 1001;
+        $subjectgroup1->save();
+
+        $subjectgroup2 = new SubjectsGroup;
+        $subjectgroup2->subject_id = 1003;
+        $subjectgroup2->class_id = 1001;
+        $subjectgroup2->save();
+
+        $subjectgroup3 = new SubjectsGroup;
+        $subjectgroup3->subject_id = 1004;
+        $subjectgroup3->class_id = 1001;
+        $subjectgroup3->save();
+
+        $subjectgroup4 = new SubjectsGroup;
+        $subjectgroup4->subject_id = 1005;
+        $subjectgroup4->class_id = 1001;
+        $subjectgroup4->save();
+
+        $subjectgroup5 = new SubjectsGroup;
+        $subjectgroup5->subject_id = 1006;
+        $subjectgroup5->class_id = 1001;
+        $subjectgroup5->save();
+
+        $subjectgroup6 = new SubjectsGroup;
+        $subjectgroup6->subject_id = 1001;
+        $subjectgroup6->class_id = 1002;
+        $subjectgroup6->save();
+
+        $subjectgroup7 = new SubjectsGroup;
+        $subjectgroup7->subject_id = 1002;
+        $subjectgroup7->class_id = 1002;
+        $subjectgroup7->save();
+
+        $subjectgroup8 = new SubjectsGroup;
+        $subjectgroup8->subject_id = 1003;
+        $subjectgroup8->class_id = 1002;
+        $subjectgroup8->save();
+
+        $subjectgroup9 = new SubjectsGroup;
+        $subjectgroup9->subject_id = 1004;
+        $subjectgroup9->class_id = 1002;
+        $subjectgroup9->save();
+
+        $subjectgroup10 = new SubjectsGroup;
+        $subjectgroup10->subject_id = 1005;
+        $subjectgroup10->class_id = 1002;
+        $subjectgroup10->save();
+
+        $subjectgroup11 = new SubjectsGroup;
+        $subjectgroup11->subject_id = 1007;
+        $subjectgroup11->class_id = 1002;
+        $subjectgroup11->save();
 
         /*$session = new Session;
         $session->id = 1;
@@ -323,7 +636,7 @@ class DatabaseSeeder extends Seeder
             }
         }*/
 
-        echo "<h1>Completed</h1>";
+        echo "Completed";
         exit;
     }
 }
