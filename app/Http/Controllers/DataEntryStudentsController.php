@@ -88,9 +88,55 @@ class DataEntryStudentsController extends Controller
                     ->addColumn('subjects', function($data){
                         $result = "";
                         $subjects = StudentsSubject::join('subjects', 'subjects.id', '=', 'students_subjects.subject_id')->where('students_subjects.student_id', $data->id)->get();
-                        foreach($subjects as $subject){
-                            $result.=$subject->name.", ";
+                        if(count($subjects)){
+
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+
+                            foreach($subjects as $subject){
+                                $result.='<tr style="background:transparent">';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-danger">'.$subject->id.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-secondary">'.$subject->name.'</span></h5></td>';
+                                $result.='</tr>';
+                            }
+
+                            $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
                         }
+                        return $result;
+                    })
+                    ->addColumn('fees', function($data){
+                        $fees = StudentsFee::join('semesters', 'semesters.id', '=', 'students_fees.semester_id')->where('student_id', $data->id)->orderBy('semesters.id', 'ASC')->get(['students_fees.id', 'semesters.title', 'students_fees.total_amount']);
+
+                        if(count($fees)) {
+
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+
+                            foreach($fees as $fee){
+                                $fee_selections = StudentsFeesSelection::join('fees', 'fees.id', '=', 'students_fees_selections.fee_id')->where('students_fees_selections.students_fees_id', $fee->id)->orderBy('fees.id', 'ASC')->get(['fees.id', 'fees.title']);
+
+                                $result.='<tr style="background:transparent">';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-warning">'.$fee->title.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-primary">'.$fee->total_amount.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5>';
+
+                                        foreach($fee_selections as $selection){
+                                            $result.='<span style="width:100%;" class="badge badge-danger">'.$selection->title.'</span>';
+                                        }
+                                    $result.='</h5></td>';
+
+                                $result.='</tr>';
+                            }
+
+                            $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
+                        }
+
                         return $result;
                     })
                     ->addColumn('action', function($data){

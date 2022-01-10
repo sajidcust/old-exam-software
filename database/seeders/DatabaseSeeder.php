@@ -43,6 +43,13 @@ class DatabaseSeeder extends Seeder
     	$user->user_role = 1;
     	$user->save();
 
+        $user2 = new User;
+        $user2->name = 'User';
+        $user2->email = 'assesmentcenter@beeg.gov.pk';
+        $user2->password = Hash::make('password123');
+        $user2->user_role = 2;
+        $user2->save();
+
         $user1 = new User;
         $user1->name = 'User';
         $user1->email = 'dataentry@beeg.gov.pk';
@@ -50,12 +57,7 @@ class DatabaseSeeder extends Seeder
         $user1->user_role = 3;
         $user1->save();
 
-        $user2 = new User;
-        $user2->name = 'User';
-        $user2->email = 'assesmentcenter@beeg.gov.pk';
-        $user2->password = Hash::make('password123');
-        $user2->user_role = 3;
-        $user2->save();
+        
 
         $setting = new Setting;
         $setting->id = 1;

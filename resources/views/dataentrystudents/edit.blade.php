@@ -264,10 +264,7 @@
             },
             success: function(data)
             {
-              data_arr = [];
-              for(var i = 0; i < data.length; i++){
-                  data_arr[i] = data[i];
-              }
+              data_arr = JSON.parse(data);
 
               $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
             }

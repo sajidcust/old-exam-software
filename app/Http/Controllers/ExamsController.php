@@ -62,6 +62,7 @@ class ExamsController extends Controller
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             i.name as center_name,
+                            s.class_id,
                             stds.name AS s_class,
                             ss.id AS session_id
                         FROM students AS s
@@ -72,12 +73,48 @@ class ExamsController extends Controller
                         JOIN standards as stds
                         ON s.class_id = stds.id;
                         ")))
-                    ->addColumn('subjects', function($data){
+                    ->addColumn('subs', function($data){
                         $result = "";
                         $subjects = StudentsSubject::join('subjects', 'subjects.id', '=', 'students_subjects.subject_id')->where('students_subjects.student_id', $data->id)->get();
-                        foreach($subjects as $subject){
-                            $result.=$subject->name.", ";
+                        if(count($subjects)){
+
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+
+                            foreach($subjects as $subject){
+                                $result.='<tr style="background:transparent">';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-danger">'.$subject->id.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-secondary">'.$subject->name.'</span></h5></td>';
+                                $result.='</tr>';
+                            }
+
+                            $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
                         }
+                        return $result;
+                    })
+                    ->addColumn('subjects', function($data){
+                        $result = "";
+                        $subjects = StudentsSubject::join('subjects', 'subjects.id', '=', 'students_subjects.subject_id')->join('students_exams', 'students_exams.subject_id', '=', 'subjects.id')->join('semesters', 'semesters.id', '=', 'students_exams.semester_id')->where('students_exams.student_id', $data->id)->where('students_subjects.student_id', $data->id)->orderBy('semesters.id', 'ASC')->orderBy('subjects.id', 'ASC')->get(['subjects.id', 'subjects.name', 'semesters.title', 'students_exams.total_obt_marks']);
+
+                        if(count($subjects)){
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+                                            foreach($subjects as $subject) {
+                                                $result.='<tr style="background:transparent">';
+                                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-primary">'.$subject->name.'</span></h5></td>
+                                                                <td style="margin:0px;padding:0px;padding-right:5px;text-align:center;"><h5><span style="width:100%;" class="badge badge-warning">'.$subject->title.'</span></h5></td>
+                                                                <td style="margin:0px;padding:0px;padding-right:5px;text-align:center;"><h5><span style="width:100%;" class="badge badge-success">'.$subject->total_obt_marks.'</span></h5></td>';
+                                                $result.='</tr>';
+                                            }
+                                 $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
+                        }
+
                         return $result;
                     })
                     ->addColumn('action', function($data){

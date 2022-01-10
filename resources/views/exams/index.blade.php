@@ -56,7 +56,8 @@
 	                    <th>Type</th> 
 	                    <th>Session</th> 
 	                    <th>Center</th> 
-	                    <th>Subjects</th>
+	                    <th style="text-align: center;">Subject, Semester, Obt Marks</th>
+	                    <th style="text-align: center;">Code, Subject</th>
 	                    <th>Action</th>
 	                  </tr>
 	                  </thead>
@@ -222,19 +223,23 @@
               },
               {
                 data: 'father_name',
-                name: 'father_name'
+                name: 'father_name',
+                visible: false
               },
               {
                 data: 'date_of_birth',
-                name: 'date_of_birth'
+                name: 'date_of_birth',
+                visible: false
               },
               {
                 data: 'home_address',
-                name: 'home_address'
+                name: 'home_address',
+                visible: false
               },
               {
                 data: 'cell_no',
-                name: 'cell_no'
+                name: 'cell_no',
+                visible: false
               },
               {
                 data: 's_class',
@@ -257,11 +262,29 @@
                 name: 'subjects'
               },
               {
+                data: 'subs',
+                name: 'subs',
+                visible:false
+              },
+              {
                 data: 'action',
                 name: 'action',
                 orderable:false
               }
             ],
+            "columnDefs": [
+	            {
+	                // The `data` parameter refers to the data for the cell (defined by the
+	                // `data` option, which defaults to the column being worked with, in
+	                // this case `data: 0`.
+	                "render": function ( data, type, row ) {
+	                    //return htmlDecode(data);
+	                    var doc = new DOMParser().parseFromString(data, "text/html");
+							return doc.documentElement.textContent;
+	                },
+	                "targets": [10, 11]
+	            }
+	        ],
         });
     });
 

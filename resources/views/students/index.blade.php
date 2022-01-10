@@ -61,7 +61,8 @@
 	                    <th>Session</th> 
 	                    <th>Institution</th> 
 	                    <th>Center</th> 
-	                    <th>Subjects</th>
+	                    <th style="text-align: center;">Semester, Total Amount, Fee Selection</th> 
+	                    <th style="text-align: center;">Code, Subject</th>
 	                    <th>Created At</th>
 	                    <th>Updated At</th>
 	                    <th>Action</th>
@@ -284,6 +285,11 @@
                 name: 'center_name'
               },
               {
+                data: 'fees',
+                name: 'fees',
+                visible:false
+              },
+              {
                 data: 'subjects',
                 name: 'subjects',
                 visible:false
@@ -314,7 +320,7 @@
 	                    var doc = new DOMParser().parseFromString(data, "text/html");
 							return doc.documentElement.textContent;
 	                },
-	                "targets": [9]
+	                "targets": [9, 15, 16]
 	            }
 	        ],
         });
