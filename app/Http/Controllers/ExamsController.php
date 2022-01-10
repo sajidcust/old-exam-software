@@ -787,7 +787,29 @@ class ExamsController extends Controller
             Gazette::where('session_id', $session_id)->where('class_id', $class_id)->delete();
             TableOfContent::where('session_id', $session_id)->where('class_id', $class_id)->delete();
 
+            $standard = Standard::find($class_id);
+            $semesters = Semester::where('session_id', $session_id)->get();
+
+            //dd($semesters);
+
             foreach($students as $student) {
+
+                $all_subs_added = true;
+
+                foreach($semesters as $semester) {
+                    $se_count = StudentsExam::where('student_id', $student->roll_no)->where('semester_id', $semester->id)->count();
+
+                    if($se_count < $standard->min_subjects){
+                        $all_subs_added = false;
+                    } else {
+                        $all_subs_added = true;
+                    }
+
+                }
+
+                if($all_subs_added == false) {
+                    continue;
+                }
 
                 //$gazette =  Gazette::where('session_id', $session_id)->where('class_id', $class_id)->where('student_id', $student->roll_no)->first(['created_at']);
 

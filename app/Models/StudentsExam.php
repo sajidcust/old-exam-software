@@ -268,7 +268,7 @@ class StudentsExam extends Model
                     GROUP BY result;
                 "), array('session_id'=>$session_id, 'standard_id'=>$standard_id));
 
-        //dd($results);
+
         $results_arr = array();
 
         $total_students_appeared = 0;
