@@ -270,6 +270,9 @@ class StudentsExam extends Model
 
 
         $results_arr = array();
+        $results_arr['pass_students'] = 0;
+        $results_arr['promoted_students'] = 0;
+        $results_arr['reappear_students'] = 0;
 
         $total_students_appeared = 0;
         foreach($results as $result){
