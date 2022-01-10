@@ -624,45 +624,49 @@ class StudentsExam extends Model
                         ORDER BY d.semester_id DESC, d.paper_date DESC;
                     '), array('session_id'=>$session_id, 'class_id'=>$class_id, 'student_id'=>$student_id));
 
-        $months_arr = array();
-        $i = 0;
+        if(count($results)){
+            $months_arr = array();
+            $i = 0;
 
-        $current_semester = NULL;
-        $previous_semester = NULL;
+            $current_semester = NULL;
+            $previous_semester = NULL;
 
-        $recent_month_arr = array();
+            $recent_month_arr = array();
 
-        foreach($results as $result){
+            foreach($results as $result){
 
-            if($current_semester == $previous_semester){
-                $current_semester = $result->semester_id;
-                $recent_month_arr[$i] = $result->month;
-            } else {
-                $months_arr[$i] = $result->month;
+                if($current_semester == $previous_semester){
+                    $current_semester = $result->semester_id;
+                    $recent_month_arr[$i] = $result->month;
+                } else {
+                    $months_arr[$i] = $result->month;
+                }
+
+                $previous_semester = $current_semester;
+                $i++;
             }
 
-            $previous_semester = $current_semester;
-            $i++;
-        }
+            $count_value_arr = array_count_values($recent_month_arr);
 
-        $count_value_arr = array_count_values($recent_month_arr);
+            $max_value = max($count_value_arr);
 
-        $max_value = max($count_value_arr);
+            $final_month = 1;
 
-        $final_month = 1;
-
-        foreach($count_value_arr as $key => $value){
-            if($value == $max_value){
-                $final_month = $key;
-                break;
+            foreach($count_value_arr as $key => $value){
+                if($value == $max_value){
+                    $final_month = $key;
+                    break;
+                }
             }
+
+            $monthNum  = 3;
+            $dateObj   = DateTime::createFromFormat('!m', $final_month);
+            $monthName = $dateObj->format('F');
+
+            return $monthName."-".$year;
+        } else {
+            return NULL;
         }
-
-        $monthNum  = 3;
-        $dateObj   = DateTime::createFromFormat('!m', $final_month);
-        $monthName = $dateObj->format('F');
-
-        return $monthName."-".$year;
     }
 
     public static function numberToWords($num)

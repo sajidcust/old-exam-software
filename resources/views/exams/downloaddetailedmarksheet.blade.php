@@ -297,50 +297,67 @@ if($percentage_marks >= 80) {
       <?php $combined_subject_total_max_marks = 0; ?>
       @foreach($semesters as $semester)
 
+
         <?php $marks_details = App\Models\StudentsExam::getMarkDetailsBySemester($student->id, $subject->id, $semester->id); ?>
 
-        <?php $combined_subject_total_obt_marks+=$marks_details->total_obt_marks; ?>
-        <?php $combined_subject_total_max_marks+=$marks_details->total_max_marks; ?>
+        @if($marks_details)
+          <?php $combined_subject_total_obt_marks+=$marks_details->total_obt_marks; ?>
+          <?php $combined_subject_total_max_marks+=$marks_details->total_max_marks; ?>
 
-        @if(!$marks_details->is_absent)
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_max_marks }}</td>
-            @if($marks_details->has_practical)
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_max_marks }}</td>
-            @else
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
-            @endif
+          @if(!$marks_details->is_absent)
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_max_marks }}</td>
+              @if($marks_details->has_practical)
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_max_marks }}</td>
+              @else
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+              @endif
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_max_marks }}</td> 
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_max_marks }}</td> 
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_obt_marks }}</td>
-            @if($marks_details->has_practical)
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_obt_marks }}</td>
-            @else
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
-            @endif
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_obt_marks }}</td>
+              @if($marks_details->has_practical)
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_obt_marks }}</td>
+              @else
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+              @endif
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_obt_marks }}</td>            
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_obt_marks }}</td>            
 
-        @else
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_max_marks }}</td>
-            @if($marks_details->has_practical)
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_max_marks }}</td>
-            @else
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
-            @endif
+          @else
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->theory_max_marks }}</td>
+              @if($marks_details->has_practical)
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->practical_max_marks }}</td>
+              @else
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+              @endif
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_max_marks }}</td> 
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_max_marks }}</td> 
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">A</td>
-            @if($marks_details->has_practical)
               <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">A</td>
-            @else
-              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
-            @endif
+              @if($marks_details->has_practical)
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">A</td>
+              @else
+                <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+              @endif
 
-            <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_obt_marks }}</td> 
+              <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">{{ $marks_details->total_obt_marks }}</td> 
 
-        @endif
+          @endif
+      @else
+        <?php $combined_subject_total_obt_marks+=0; ?>
+        <?php $combined_subject_total_max_marks+=0; ?>
+
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td> 
+
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+
+        <td style="font-size: 13px; border: 1px solid #000000; text-align:center;">&nbsp;</td>
+      @endif
+
       @endforeach
     <td style="font-size: 13px; border: 1px solid #000000; text-align: center;">{{ $combined_subject_total_obt_marks }}</td>
     <td style="font-size: 13px; border: 1px solid #000000; text-align: center;">
