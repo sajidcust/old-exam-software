@@ -24,6 +24,8 @@ use App\Http\Controllers\DataEntryStudentsController;
 use App\Http\Controllers\AssesmentCenterController;
 use App\Http\Controllers\MarksController;
 use App\Http\Controllers\ImportExportsController;
+use App\Http\Controllers\FailedJobsController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -204,6 +206,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 
 	Route::get('/settings/index', [SettingsController::class, 'index']);
 	Route::post('/settings/update', [SettingsController::class, 'update'])->name('settings.update');
+
+	Route::get('/failedjobs/index', [FailedJobsController::class, 'index'])->name('failedjobs.index');
+	Route::post('/failedjobs/destroy', [FailedJobsController::class, 'destroy'])->name('failedjobs.destroy');
+	Route::post('/failedjobs/destroyall', [FailedJobsController::class, 'destroyall'])->name('failedjobs.destroyall');
 
 	Route::get('/exams/generatemarksheets', [ExamsController::class, 'generatemarksheets'])->name('exams.generatemarksheets');
 	Route::get('/exams/downloadmarksheet/{id}', [ExamsController::class, 'downloadmarksheet']);

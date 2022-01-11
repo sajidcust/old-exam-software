@@ -17,12 +17,15 @@ use App\Models\Standard;
 use App\Models\Gazette;
 use App\Models\Setting;
 use App\Models\TableOfContent;
+use App\Models\FailedJob;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
+
 use DB;
 use PDF;
+use Hash;
 
 class ExamsController extends Controller
 {
@@ -803,13 +806,18 @@ class ExamsController extends Controller
                     if($se_count < $standard->min_subjects){
                         $all_subs_added = false;
 
-                        /*$log = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $student->roll_no. '] and Name: ['. $student->student_name . '] For Semester:['. $semester->title .'] Error Code: [GZT001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
+                        $exception = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $student->roll_no. '] and Name: ['. $student->student_name . '] For Semester:['. $semester->title .'] Error Code: [GZT001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
                         
-                        $myfile = fopen(storage_path("systemlog\log.txt"), "w") or die("Unable to open file!");
-                        fwrite($myfile, $log);
-                        fclose($myfile);*/
+                        $fj = new FailedJob;
+                        $fj->timestamps = false;
+                        $fj->uuid = date('dmYhis').''.$student->roll_no.''.$semester->id;
+                        $fj->connection = DB::connection()->getDriverName();
+                        $fj->queue = 'GZT';
+                        $fj->payload = Hash::make('GZT');
+                        $fj->exception = $exception;
+                        $fj->failed_at = date('Y-m-d h:i:s');
+                        $fj->save();
 
-                        //Storage::disk('local')->put('systemlogs\log.txt', $log);
                     } else {
                         $all_subs_added = true;
                     }

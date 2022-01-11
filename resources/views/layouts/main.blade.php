@@ -702,8 +702,14 @@
           @if(auth()->user()->user_role == 1)
           <li class="nav-item">
             <a href="{{ url('admin/settings/index') }}" class="nav-link {{ $selected_sub_menu == 'settings_index' ? 'active open':'' }}">
-              <i class="nav-icon far fa fa-cog text-primary"></i>
+              <i class="nav-icon far fa fa-cog text-info"></i>
               <p class="text">Settings</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ url('admin/failedjobs/index') }}" class="nav-link {{ $selected_sub_menu == 'failed_jobs_index' ? 'active open':'' }}">
+              <i class="nav-icon far fa fa-times-circle text-warning"></i>
+              <p class="text">Failed Jobs</p>
             </a>
           </li>
           @endif
