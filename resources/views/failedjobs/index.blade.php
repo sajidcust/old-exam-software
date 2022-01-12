@@ -49,6 +49,7 @@
 	                    <th>ID</th>
 	                    <th>Process ID</th>
 	                    <th>Error</th>
+	                    <th>Queue</th>
 	                    <th>Failed At</th>
 	                    <th>Action</th>
 	                  </tr>
@@ -283,6 +284,10 @@
               {
                 data: 'exception',
                 name: 'exception'
+              },
+              {
+                data: 'queue',
+                name: 'queue'
               },
               {
                 data: 'failed_at',

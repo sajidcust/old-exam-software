@@ -22,6 +22,7 @@ use App\Models\FailedJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 use DB;
 use PDF;
@@ -788,13 +789,35 @@ class ExamsController extends Controller
                             ORDER BY i.id;
                     "));
 
-            Gazette::where('session_id', $session_id)->where('class_id', $class_id)->delete();
-            TableOfContent::where('session_id', $session_id)->where('class_id', $class_id)->delete();
-
             $standard = Standard::find($class_id);
             $semesters = Semester::where('session_id', $session_id)->get();
 
-            //dd($semesters);
+            $students_counter = count($students);
+
+            if($students_counter == 0 ) {
+                $stdnts = Student::where('session_id', $session_id)->where('class_id', $class_id)->get(['id', 'name']);
+
+                if(count($stdnts)>0){
+                    foreach($stdnts as $stdnt){
+                        foreach($semesters as $semester){
+                            $exception = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $stdnt->id. '] and Name: ['. $stdnt->name . '] For Semester:['. $semester->title .'] Error Code: [GZT-001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
+                        
+                            $fj = new FailedJob;
+                            $fj->timestamps = false;
+                            $fj->uuid = Str::uuid()->toString();
+                            $fj->connection = DB::connection()->getDriverName();
+                            $fj->queue = 'GZT';
+                            $fj->payload = 'GZT-'.$stdnt->id.'-'.$semester->id;;
+                            $fj->exception = $exception;
+                            $fj->failed_at = date('Y-m-d h:i:s');
+                            $fj->save();
+                        }
+                    }
+                }
+            }
+
+            Gazette::where('session_id', $session_id)->where('class_id', $class_id)->delete();
+            TableOfContent::where('session_id', $session_id)->where('class_id', $class_id)->delete();
 
             foreach($students as $student) {
 
@@ -806,14 +829,15 @@ class ExamsController extends Controller
                     if($se_count < $standard->min_subjects){
                         $all_subs_added = false;
 
-                        $exception = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $student->roll_no. '] and Name: ['. $student->student_name . '] For Semester:['. $semester->title .'] Error Code: [GZT001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
+                        $exception = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $student->roll_no. '] and Name: ['. $student->student_name . '] For Semester:['. $semester->title .'] Error Code: [GZT-001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
                         
                         $fj = new FailedJob;
                         $fj->timestamps = false;
                         $fj->uuid = date('dmYhis').''.$student->roll_no.''.$semester->id;
+                        $fj->uuid = Str::uuid()->toString();
                         $fj->connection = DB::connection()->getDriverName();
                         $fj->queue = 'GZT';
-                        $fj->payload = Hash::make('GZT');
+                        $fj->payload = 'GZT-'.$student->roll_no.'-'.$semester->id;
                         $fj->exception = $exception;
                         $fj->failed_at = date('Y-m-d h:i:s');
                         $fj->save();

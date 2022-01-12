@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AcademicQualification;
+use App\Exports\DownloadExcelWithMinLimit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
@@ -25,7 +25,7 @@ class AdminController extends Controller
     public function index()
     {
 
-        $array = Excel::toArray([], storage_path('imports/centers_data_ghizer.xlsx'));
+        /*$array = Excel::toArray([], storage_path('imports/centers_data_ghizer.xlsx'));
 
         //$theArray = Excel::toArray([], 'myexcelfile.xlsx');
         $new_array = array();
@@ -82,7 +82,52 @@ class AdminController extends Controller
             }
             $counter++;
             $i++;
-        }
+        }*/
+
+        
+
+        //$collection = collect($users);
+
+        $users = [
+            [
+                'id' => 1,
+                'name' => 'Hardik',
+                'email' => 'hardik@gmail.com'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Vimal',
+                'email' => 'vimal@gmail.com'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Harshad',
+                'email' => 'harshad@gmail.com'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Waqar',
+                'email' => 'waqarulhassan50@gmail.com'
+            ],
+        ];
+
+        return Excel::download(new DownloadExcelWithMinLimit($users), 'invoices2.xlsx');
+
+        dd($download);
+
+        /*$data = array(
+            $users
+        );
+
+        Excel::download('users', function($excel) use($data) {
+
+            $excel->sheet('Sheet1', function($sheet) use($data) {
+
+                $sheet->fromArray($data);
+
+            });
+
+        })->export('xls');*/
         
         //foreach($input as $inp){
 

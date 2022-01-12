@@ -26,13 +26,12 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
 
     use Exportable;
 
-    protected $min_records;
+    protected $data;
     protected $nomination_id;
 
-    public function __construct(int $min_records, int $nomination_id)
+    public function __construct($data)
     {
-        $this->min_records = $min_records;
-        $this->nomination_id = $nomination_id;
+        $this->data = $data;
     }
 
     /*public function view(): View
@@ -78,6 +77,27 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
 
     public function collection()
     {
+
+        /*$users = [
+            [
+                'id' => 1,
+                'name' => 'Hardik',
+                'email' => 'hardik@gmail.com'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Vimal',
+                'email' => 'vimal@gmail.com'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Harshad',
+                'email' => 'harshad@gmail.com'
+            ]
+        ];*/
+
+        return collect($this->data);
+
     	/*$students = [
     		[
                 'student_id' => 'Povilas',
@@ -97,7 +117,7 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
             ]
         ];*/
 
-        $students = User::join('student_academic_qualifications', 'student_academic_qualifications.student_id', '=', 'users.id')
+        /*$students = User::join('student_academic_qualifications', 'student_academic_qualifications.student_id', '=', 'users.id')
 	                    ->join('academic_qualifications', 'academic_qualifications.id', '=', 'student_academic_qualifications.qualification_id')
 	                    ->join('nominations', 'nominations.id', '=', 'student_academic_qualifications.nomination_id')
 	                    ->join('students_nominations', function($join){
@@ -174,7 +194,7 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
         	$i++;
         }
 
-        return collect($fields);
+        return collect($fields);*/
     }
 
     /*public function map($user):array
@@ -193,7 +213,14 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
 
     public function headings():array
     {
-    	$headings = array();
+        $headings = array();
+        $headings[0] = "id";
+        $headings[1] = "name";
+        $headings[2] = "email";
+
+        return $headings;
+
+    	/*$headings = array();
     	$headings[0] = "id";
 		$headings[1] = "name";
 		$headings[2] = "father_name";
@@ -221,6 +248,6 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
         	$i++;
         }
 
-        return $headings;
+        return $headings;*/
     }
 }

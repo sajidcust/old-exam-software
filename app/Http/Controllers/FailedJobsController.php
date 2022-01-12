@@ -28,7 +28,7 @@ class FailedJobsController extends Controller
         $this->card_title = "View and delete all failed jobs shown below.";
         if(request()->ajax())
         {
-            return datatables()->of(FailedJob::select('failed_jobs.id', 'failed_jobs.uuid', 'failed_jobs.exception', 'failed_jobs.failed_at')->get())
+            return datatables()->of(FailedJob::select('failed_jobs.id', 'failed_jobs.uuid', 'failed_jobs.exception', 'failed_jobs.queue', 'failed_jobs.failed_at')->get())
                     ->addColumn('action', function($data){
                         $button = '<button type="button" name="delete" id = "dlt_button" class="btn btn-danger margin-2px btn-sm" data-url="'.route('failedjobs.destroy').'" data-failedjobid="'.$data->id.'" data-token="'.csrf_token().'"><span class="fa fa-window-close"></span></button>';
                         return $button;
