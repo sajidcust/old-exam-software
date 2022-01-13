@@ -34,17 +34,13 @@ class AdminController extends Controller
      */
     public function index()
     {
-        ini_set('max_execution_time', 5000);
+        /*ini_set('max_execution_time', 5000);
 
-        $array = Excel::toArray([], storage_path('imports/exportable_data/students_data/ready_to_import/data_gilgit_class_8th.xlsx'));
+        $array = Excel::toArray([], storage_path('imports/exportable_data/students_data/ready_to_import/data_hunza_class_8th.xlsx'));*/
 
         /*$breaker = 0;
 
         foreach($array[0] as $arr){
-
-            if($breaker == 5){
-                break;
-            }
 
             $session_id = 2022;
             $class_id = 1001;
@@ -178,13 +174,9 @@ class AdminController extends Controller
 
         //---------------------------Class 8th Code-------------------------------
 
-        $breaker = 0;
+        /*$breaker = 0;
 
         foreach($array[0] as $arr){
-
-            if($breaker == 5){
-                break;
-            }
 
             $session_id = 2022;
             $class_id = 1002;
@@ -317,7 +309,7 @@ class AdminController extends Controller
             $breaker ++;
         }
 
-        exit;
+        exit;*/
 
 
         $this->selected_sub_menu = "admin_dashboard";
