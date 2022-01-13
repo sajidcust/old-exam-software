@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Redirect;
 use DB;
 use Excel;
 
+use App\Models\Institution;
+use App\Models\StudentsExam;
+use App\Models\Student;
+use App\Models\Semester;
+use App\Models\StudentsSubject;
+use App\Models\StudentsSemester;
+use App\Models\StudentsFee;
+use App\Models\StudentsFeesSelection;
+
+
 class AdminController extends Controller
 {
     protected $page_title = "Directorate of Education Colleges GB | Admin";
@@ -24,149 +34,291 @@ class AdminController extends Controller
      */
     public function index()
     {
+        ini_set('max_execution_time', 5000);
 
-        /*$array = Excel::toArray([], storage_path('imports/centers_data_ghizer.xlsx'));
+        $array = Excel::toArray([], storage_path('imports/exportable_data/students_data/ready_to_import/data_gilgit_class_8th.xlsx'));
 
-        //$theArray = Excel::toArray([], 'myexcelfile.xlsx');
-        $new_array = array();
-        $index = 0;
+        /*$breaker = 0;
+
         foreach($array[0] as $arr){
-            $new_array[$index]['id'] = (int)(trim($arr[0]));
-            $new_array[$index]['center_name'] = strtolower(str_replace(' ', '_', trim($arr[1])));
-            $new_array[$index]['institute_name'] = strtolower(str_replace(' ', '_', trim($arr[2])));
-            $index++;
-        }
 
-        //dd($new_array);
+            if($breaker == 5){
+                break;
+            }
 
-        $input = array_map("unserialize", array_unique(array_map("serialize", $new_array)));
+            $session_id = 2022;
+            $class_id = 1001;
 
-        //dd($input);
+            $center_id = (int)$arr[0];
+            $school_id = (int)$arr[1];
+            $name = trim($arr[2]);
+            $father_name = trim($arr[3]);
+
+            $date_of_birth = "";
+            $dob_in_words = "";
+
+            if($arr[4] != NULL || $arr[4] != ''){
+                $date_of_birth = date('Y-m-d', strtotime($arr[4]));
+
+                $e_arr = explode('-', $date_of_birth);
+
+                $year = $e_arr[0];
+                $month = $e_arr[1];
+                $day = $e_arr[2];
+
+                $se = new StudentsExam;
+
+                $year_text = $se->convert_number($year);
+                $day_text = $se->convert_day($day);
+                $month_text = date('F', mktime(0, 0, 0, $month, 10));
+
+                $dob_in_words = $day_text.' '.$month_text.' '.$year_text;
+            }
+            
+            $gender = (int)$arr[5];
+            $email = trim($arr[6]);
+            $cell_no = trim($arr[7]);
+            $home_address = trim($arr[8]);
+            $student_type = (int)$arr[9];
+            
+            $bank_id = (int)$arr[10];
+            $challan_no = (int)$arr[11];
+
+            $deposit_date = "";
+
+            if($arr[12] != NULL || $arr[12] != '') {
+                $deposit_date = date('Y-m-d', strtotime($arr[12]));
+            }
+            
+            $amount = (int)$arr[13];
 
 
-        $ids_array = array();
-        $j=0;
 
-        foreach($input as $inp) {
-            $ids_array[$j] = $inp['id'];
-            $j++;
-        }
+            $student = new Student;
+            $student->name = $name;
+            $student->father_name = $father_name;
 
-        $unique_ids = array_unique($ids_array);
+            if($date_of_birth != "") {
+                $student->date_of_birth = $date_of_birth;
+                $student->dob_in_words = $dob_in_words;
+            }
 
-        $i=1;
-        $failed_array = array();
-        $counter = 0;
-        $first_value = false;
+            $student->gender = $gender;
+            $student->home_address = $home_address;
+            $student->cell_no = $cell_no;
+            $student->email = $email;
+            $student->student_type = $student_type;
+            $student->session_id = $session_id;
+            $student->institution_id = $school_id;
+            $student->center_id = $center_id;
+            $student->class_id = $class_id;
 
-        foreach($unique_ids as $inp){
-            $first_value = false;
-            foreach($input as $inp2){
-                if($inp == $inp2['id']) {
-                    if($inp2['center_name'] == $inp2['institute_name']) {
-                        $first_value = true;
-                    }
+            $student->save();
 
-                    if($first_value) {
-                        echo "<h4>";
-                        echo $i."-".$inp2['id'].":". strtoupper(str_replace('_', ' ', $inp2['center_name']))."-<span style='color:red'>".strtoupper(str_replace('_', ' ', $inp2['institute_name']))."</span>";
-                        echo "</h4>";
-                    } 
-                    if(!$first_value) {
-                        $failed_array[$counter]['id'] = $inp2['id'];
-                        $failed_array[$counter]['center_name'] = $inp2['center_name'];
-                        $failed_array[$counter]['institute_name'] = $inp2['institute_name'];
-                        $counter++;
-                    }
+            // Subjects
+            $sub_array = [1001, 1002, 1003, 1004, 1005, 1006];
+
+            foreach($sub_array as $sarr) {
+                $students_subject = new StudentsSubject;
+                $students_subject->student_id = $student->id;
+                $students_subject->subject_id = $sarr;
+                $students_subject->save();
+            }
+
+            // Add Semesters
+
+            StudentsSemester::where('student_id', $student->id)->delete();
+
+            $semesters = Semester::where('session_id', $session_id)->get();
+            foreach($semesters as $semester){
+                $studentsemester = new StudentsSemester;
+                $studentsemester->student_id = $student->id;
+                $studentsemester->semester_id = $semester->id;
+                $studentsemester->save();
+            }
+
+
+            // Students Fees
+
+            if($deposit_date != "" && $bank_id != ""){
+                $studentfee = new StudentsFee;
+                $studentfee->student_id = $student->id;
+                $studentfee->semester_id = 1;
+                $studentfee->bank_id = $bank_id;
+                $studentfee->challan_no = $challan_no;
+                $studentfee->date_of_deposit = $deposit_date;
+                $studentfee->total_amount = $amount;
+                $studentfee->save();
+
+                $fee_ids = array();
+                if($student_type == 0) {
+                    $fee_ids = [1001, 1002, 1003];
+                } else {
+                    $fee_ids = [1001, 1002, 1004];
+                }
+
+                $counter = count($fee_ids);
+
+                for($i=0; $i<$counter; $i++){
+                    $students_fees_selection = new StudentsFeesSelection;
+                    $students_fees_selection->students_fees_id = $studentfee->id;
+                    $students_fees_selection->student_id = $student->id;
+                    $students_fees_selection->semester_id = 1;
+                    $students_fees_selection->fee_id = $fee_ids[$i];
+                    $students_fees_selection->save();
                 }
             }
-            $counter++;
-            $i++;
-        }*/
 
-        
+            echo $breaker.":::".$student->name."<br>";
 
-        //$collection = collect($users);
+            $breaker ++;
+        }
 
-        $users = [
-            [
-                'id' => 1,
-                'name' => 'Hardik',
-                'email' => 'hardik@gmail.com'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Vimal',
-                'email' => 'vimal@gmail.com'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Harshad',
-                'email' => 'harshad@gmail.com'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Waqar',
-                'email' => 'waqarulhassan50@gmail.com'
-            ],
-        ];
+        exit;*/
 
-        return Excel::download(new DownloadExcelWithMinLimit($users), 'invoices2.xlsx');
+        //---------------------------Class 8th Code-------------------------------
 
-        dd($download);
+        $breaker = 0;
 
-        /*$data = array(
-            $users
-        );
+        foreach($array[0] as $arr){
 
-        Excel::download('users', function($excel) use($data) {
-
-            $excel->sheet('Sheet1', function($sheet) use($data) {
-
-                $sheet->fromArray($data);
-
-            });
-
-        })->export('xls');*/
-        
-        //foreach($input as $inp){
-
-            /*if($inp['center_name'] == $inp['institute_name']){
-                echo "<h1>".$inp['center_name']."::::".$inp['institute_name']."</h1>";
-                $first_value = true;
+            if($breaker == 5){
+                break;
             }
 
-            if($inp['center_name'] != $inp['institute_name']) {
-                $first_value = false;
-            }*/
+            $session_id = 2022;
+            $class_id = 1002;
 
-            /*if($first_value){
-                echo "<h4>";
-                echo $i."-".$inp['id'].":". strtoupper(str_replace('_', ' ', $inp['center_name']))."-<span style='color:red'>".strtoupper(str_replace('_', ' ', $inp['institute_name']))."</span>";
-                echo "</h1>";
-            } else {
-                $failed_array[$counter]['id'] = $inp['id'];
-                $failed_array[$counter]['center_name'] = $inp['center_name'];
-                $failed_array[$counter]['institute_name'] = $inp['institute_name'];
-                $counter++;
+            $center_id = (int)$arr[0];
+            $school_id = (int)$arr[1];
+            $name = trim($arr[2]);
+            $father_name = trim($arr[3]);
+
+            $date_of_birth = "";
+            $dob_in_words = "";
+
+            if($arr[4] != NULL || $arr[4] != ''){
+                $date_of_birth = date('Y-m-d', strtotime($arr[4]));
+
+                $e_arr = explode('-', $date_of_birth);
+
+                $year = $e_arr[0];
+                $month = $e_arr[1];
+                $day = $e_arr[2];
+
+                $se = new StudentsExam;
+
+                $year_text = $se->convert_number($year);
+                $day_text = $se->convert_day($day);
+                $month_text = date('F', mktime(0, 0, 0, $month, 10));
+
+                $dob_in_words = $day_text.' '.$month_text.' '.$year_text;
             }
-            $i++;*/
-        //}
+            
+            $gender = (int)$arr[5];
+            $email = trim($arr[6]);
+            $cell_no = trim($arr[7]);
+            $home_address = trim($arr[8]);
+            $student_type = (int)$arr[9];
+            
+            $bank_id = (int)$arr[10];
+            $challan_no = (int)$arr[11];
 
-        dd($failed_array);
+            $deposit_date = "";
+
+            if($arr[12] != NULL || $arr[12] != '') {
+                $deposit_date = date('Y-m-d', strtotime($arr[12]));
+            }
+            
+            $amount = (int)$arr[13];
+
+            $elective1 = (int)$arr[14];
+            $elective2 = (int)$arr[15];
+
+
+
+            $student = new Student;
+            $student->name = $name;
+            $student->father_name = $father_name;
+
+            if($date_of_birth != "") {
+                $student->date_of_birth = $date_of_birth;
+                $student->dob_in_words = $dob_in_words;
+            }
+
+            $student->gender = $gender;
+            $student->home_address = $home_address;
+            $student->cell_no = $cell_no;
+            $student->email = $email;
+            $student->student_type = $student_type;
+            $student->session_id = $session_id;
+            $student->institution_id = $school_id;
+            $student->center_id = $center_id;
+            $student->class_id = $class_id;
+
+            $student->save();
+
+            // Subjects
+            $sub_array = [1001, 1002, 1003, 1004, 1005, 1007, $elective1, $elective2];
+
+            foreach($sub_array as $sarr) {
+                $students_subject = new StudentsSubject;
+                $students_subject->student_id = $student->id;
+                $students_subject->subject_id = $sarr;
+                $students_subject->save();
+            }
+
+            // Add Semesters
+
+            StudentsSemester::where('student_id', $student->id)->delete();
+
+            $semesters = Semester::where('session_id', $session_id)->get();
+            foreach($semesters as $semester){
+                $studentsemester = new StudentsSemester;
+                $studentsemester->student_id = $student->id;
+                $studentsemester->semester_id = $semester->id;
+                $studentsemester->save();
+            }
+
+
+            // Students Fees
+
+            if($deposit_date != "" && $bank_id != ""){
+                $studentfee = new StudentsFee;
+                $studentfee->student_id = $student->id;
+                $studentfee->semester_id = 1;
+                $studentfee->bank_id = $bank_id;
+                $studentfee->challan_no = $challan_no;
+                $studentfee->date_of_deposit = $deposit_date;
+                $studentfee->total_amount = $amount;
+                $studentfee->save();
+
+                $fee_ids = array();
+                if($student_type == 0) {
+                    $fee_ids = [1001, 1002, 1005];
+                } else {
+                    $fee_ids = [1001, 1002, 1006];
+                }
+
+                $counter = count($fee_ids);
+
+                for($i=0; $i<$counter; $i++){
+                    $students_fees_selection = new StudentsFeesSelection;
+                    $students_fees_selection->students_fees_id = $studentfee->id;
+                    $students_fees_selection->student_id = $student->id;
+                    $students_fees_selection->semester_id = 1;
+                    $students_fees_selection->fee_id = $fee_ids[$i];
+                    $students_fees_selection->save();
+                }
+            }
+
+            echo $breaker.":::".$student->name."<br>";
+
+            $breaker ++;
+        }
 
         exit;
 
-        dd($input);
-        echo "here";exit;
-
-        //$database = DB::connection()->getPdo();
-        //$driver_name = DB::connection()->getDriverName();
-        //dd($driver_name);
-
-        //strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,
-        //(CASE  WHEN s.gender=0 THEN 'Male' ELSE 'Female' END) AS gender,
-        //(CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
 
         $this->selected_sub_menu = "admin_dashboard";
         $this->card_title = "Admin Dashboard";

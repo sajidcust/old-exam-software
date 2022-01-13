@@ -214,9 +214,23 @@ class DownloadExcelWithMinLimit implements FromCollection, WithHeadings, ShouldA
     public function headings():array
     {
         $headings = array();
-        $headings[0] = "id";
-        $headings[1] = "name";
-        $headings[2] = "email";
+
+        $headings[0] = 'center_id';
+        $headings[1] = 'institution_id';
+        $headings[2] = 'name';
+        $headings[3] = 'father_name';
+        $headings[4] = 'date_of_birth';
+        $headings[5] = 'gender';
+        $headings[6] = 'email';
+        $headings[7] = 'cell_no';
+        $headings[8] = 'home_address';
+        $headings[9] = 'student_type';
+        $headings[10] = 'bank';
+        $headings[11] = 'challan_no';
+        $headings[12] = 'deposit_date';
+        $headings[13] = 'amount';
+        $headings[13] = 'elective1';
+        $headings[13] = 'elective2';
 
         return $headings;
 
