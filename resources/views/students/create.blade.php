@@ -446,8 +446,7 @@
           required: true
         },
         home_address: {
-          required: true,
-          minlength: 5
+          minlength: 1
         },
         cell_no: {
           minlength: 12,
