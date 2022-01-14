@@ -254,6 +254,31 @@ class StudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
+    public function createsearchedstudent($session_id, $class_id, $center_id)
+    {
+        $this->selected_sub_menu = "students_create";
+        $this->card_title = "Please fill in the form to create a new student.";
+
+        $institutions = Institution::all();
+        $sessions = Session::all();
+        $subjects = Subject::all();
+        $standards = Standard::all();
+        return view('students.create')
+            ->with('institutions', $institutions)
+            ->with('sessions', $sessions)
+            ->with('subjects', $subjects)
+            ->with('standards', $standards)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
     public function getFeeData(Request $request){
         $s_class = $request->input('s_class');
         $s_type = $request->input('s_type');
@@ -288,6 +313,10 @@ class StudentsController extends Controller
      */
     public function store(Request $request)
     {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $validator = Validator::make($request->all(), Student::$rules);
         if ($validator->passes()) {
 
@@ -350,8 +379,17 @@ class StudentsController extends Controller
                 $studentsemester->save();
             }
 
-            return Redirect::to('admin/students/search')
-                ->with('message', 'New student created successfully.');
+            if($session_id && $class_id && $center_id) {
+                return Redirect::to('admin/students/searchstudent')
+                    ->with('session_id', $session_id)
+                    ->with('class_id', $class_id)
+                    ->with('center_id', $center_id)
+                    ->with('message', 'New student created successfully.');
+            } else {
+                return Redirect::to('admin/students/index')
+                    ->with('message', 'New student created successfully.');
+            }
+
         } else {
             return Redirect::to('admin/students/create')
                 ->withErrors($validator)
@@ -407,6 +445,40 @@ class StudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
+    public function editsearchedstudent($id, $session_id, $class_id, $center_id)
+    {
+        $this->selected_sub_menu = "students_create";
+        $this->card_title = "Please fill in the form to update the student.";
+
+        $student = Student::find($id);
+        $institutions = Institution::all();
+        if (!$student) {
+            return Redirect::to('admin/students/index')
+                ->with('error', 'Something went wrong! Please try again later.');
+        }
+
+        $sessions = Session::all();
+        $students_subjects = StudentsSubject::where('student_id', $student->id)->get();
+        $subjects = Subject::all();
+        $standards = Standard::all();
+        return view('students.edit')
+            ->with('student', $student)
+            ->with('institutions', $institutions)
+            ->with('sessions', $sessions)
+            ->with('subjects', $subjects)
+            ->with('standards', $standards)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('students_subjects', $students_subjects)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -416,6 +488,10 @@ class StudentsController extends Controller
      */
     public function update(Request $request)
     {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $student = Student::find($request->input('student_id'));
         if($student){
             $validator = Validator::make($request->all(), Student::$rules_edit);
@@ -424,7 +500,7 @@ class StudentsController extends Controller
                 $semesters = Semester::where('session_id', $request->input('session_id'))->get();
 
                 if(count($semesters) == 0){
-                    return Redirect::to('admin/students/search')
+                    return Redirect::to('admin/students/index')
                         ->with('message', 'The selected session for the user does not contain any semesters. Please add at least one semester to continue.');
                 }
 
@@ -481,8 +557,12 @@ class StudentsController extends Controller
                     $studentsemester->save();
                 }
 
-                return Redirect::to('admin/students/search')
-                    ->with('message', 'Student updated successfully.');
+                if($session_id && $class_id && $center_id) {
+                    return redirect()->route('students.searchstudent', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id]);
+                } else {
+                    return Redirect::to('admin/students/index')
+                        ->with('message', 'Student updated successfully.');
+                }
             } else {
                 return Redirect::to('admin/students/edit/'.$student->id)
                     ->withErrors($validator)
@@ -559,8 +639,8 @@ class StudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
-    public function searchstudent(Request $request){
-
+    public function searchstudent(Request $request)
+    {
         $session_id = $request->input('session_id');
         $class_id = $request->input('class_id');
         $center_id = $request->input('center_id');
@@ -590,6 +670,8 @@ class StudentsController extends Controller
                             s.cell_no,
                             s.email,
                             s.image,
+                            s.class_id,
+                            s.center_id,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             (
@@ -670,7 +752,7 @@ class StudentsController extends Controller
                         return $result;
                     })
                     ->addColumn('action', function($data){
-                        $button = '<a style="margin-bottom:5px;" href="'.url('admin/students/edit/'.$data->id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Edit</a>';
+                        $button = '<a style="margin-bottom:5px;" href="'.url('admin/students/editsearchedstudent/'.$data->id).'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Edit</a>';
                         $button .='&nbsp;&nbsp;';
                         $button .= '<button style="margin-bottom:5px;" type="button" name="delete" id = "dlt_button" class="btn btn-danger margin-2px btn-sm" data-url="'.route('students.destroy').'" data-studentid="'.$data->id.'" data-token="'.csrf_token().'"><span class="fa fa-window-close"></span>&nbsp;&nbsp;Delete</button>';
 

@@ -82,11 +82,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::get('/students', [StudentsController::class, 'index']);
 	Route::get('/students/index', [StudentsController::class, 'index'])->name('students.index');
 	Route::get('/students/search', [StudentsController::class, 'search'])->name('students.search');
-	Route::post('/students/searchstudent', [StudentsController::class, 'searchstudent'])->name('students.searchstudent');
+	Route::get('/students/searchstudent', [StudentsController::class, 'searchstudent'])->name('students.searchstudent');
 	Route::get('/students/create', [StudentsController::class, 'create'])->name('students.create');
+	Route::get('/students/createsearchedstudent/{session_id}/{class_id}/{center_id}', [StudentsController::class, 'createsearchedstudent']);
 	Route::post('/students/store', [StudentsController::class, 'store'])->name('students.store');
 	Route::post('/students/destroy', [StudentsController::class, 'destroy'])->name('students.destroy');
 	Route::get('/students/edit/{id}', [StudentsController::class, 'edit']);
+	Route::get('/students/editsearchedstudent/{id}/{session_id}/{class_id}/{center_id}', [StudentsController::class, 'editsearchedstudent']);
 	Route::post('/students/update', [StudentsController::class, 'update'])->name('students.update');
 	Route::get('/students/getFeeData', [StudentsController::class, 'getFeeData'])->name('students.getFeeData');
 	Route::get('/students/updatefee/{id}/{semester_id}', [StudentsController::class, 'updatefee']);

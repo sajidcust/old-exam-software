@@ -44,6 +44,11 @@
               <form id="quickForm" method="post" action="{{ route('students.update') }}" enctype="multipart/form-data">
               	{{ csrf_field() }}
                 <input id="hidden_identifier" type="hidden" value="{{ $student->id }}" name="student_id">
+                @if(isset($session_id)) 
+                  <input type="hidden" name="session_id" value="{{ $session_id }}">
+                  <input type="hidden" name="class_id" value="{{ $class_id }}">
+                  <input type="hidden" name="center_id" value="{{ $center_id }}">
+                @endif
                 <input type="hidden" value="1" name="is_edit">
                 <div class="card-body">
                   <div class="form-group">
@@ -263,7 +268,7 @@
             },
             success: function(data)
             {
-              data_arr = JSON.parse(data);
+              var data_arr = JSON.parse(data);
 
               $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
             }

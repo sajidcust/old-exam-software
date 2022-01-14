@@ -37,7 +37,7 @@
                 	<h3 class="card-title custom-card-title">{{ $card_title }}</h3>
               	</div>
               	<div class="col-lg-6">
-              		<a href="{{ url('admin/students/create') }}" class="btn btn-info custom-pull-right"><span class="fa fa-plus-square"></span>&nbsp;&nbsp;New</a>
+              		<a href="{{ url('admin/students/createsearchedstudent/'.$session_id.'/'.$class_id.'/'.$center_id) }}" class="btn btn-info custom-pull-right"><span class="fa fa-plus-square"></span>&nbsp;&nbsp;New</a>
               	</div>
               </div>
               <!-- /.card-header -->
@@ -227,7 +227,7 @@
 	                center_id:"{{ $center_id }}",
 	              },
 	        	  url: "{{ route('students.searchstudent') }}",
-	        	  type:"POST"
+	        	  type:"GET"
 	        },
             columns:[
               {

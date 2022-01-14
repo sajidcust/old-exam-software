@@ -44,7 +44,7 @@
 	              </div>
 	            @endif
               <!-- form start -->
-              <form id="quickForm_genbulk" method="post" action="{{ route('students.searchstudent') }}">
+              <form id="quickForm_genbulk" method="get" action="{{ route('students.searchstudent') }}">
                 {{ csrf_field() }}
                 <div style="padding-left:20px;padding-right: 20px;">
                   <br>    
