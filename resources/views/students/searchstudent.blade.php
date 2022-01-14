@@ -335,7 +335,7 @@
 	                    var doc = new DOMParser().parseFromString(data, "text/html");
 							return doc.documentElement.textContent;
 	                },
-	                "targets": [9, 15, 16]
+	                "targets": [10, 16, 17]
 	            }
 	        ],
         });
