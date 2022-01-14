@@ -47,6 +47,7 @@
 	                	<thead>
 	                  <tr>
 	                    <th>ID</th>
+	                    <th>Registration No</th>
 	                    <th>Name</th>
 	                    <th>Father Name</th>
 	                    <th>DOB</th>
@@ -233,6 +234,10 @@
               {
                 data: 'id',
                 name: 'id'
+              },
+              {
+                data: 'registration_no',
+                name: 'registration_no'
               },
               {
                 data: 'name',

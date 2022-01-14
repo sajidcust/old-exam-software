@@ -650,10 +650,12 @@ class StudentsController extends Controller
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
+            $registration_no = "CONCAT(s.session_id, '-', s.class_id, '-', s.id) AS registration_no,";
         }
 
         if(DB::connection()->getDriverName() == 'sqlite') {
             $date_of_birth = "strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,";
+            $registration_no = "(s.session_id || '-' || s.class_id || '-' || s.id) AS registration_no,";
         }
 
         if(request()->ajax())
@@ -665,6 +667,7 @@ class StudentsController extends Controller
                             s.father_name,
                             ".$date_of_birth."
                             s.dob_in_words,
+                            ".$registration_no."
                             (CASE  WHEN s.gender=0 THEN 'Male' ELSE 'Female' END) AS gender,
                             s.home_address,
                             s.cell_no,
