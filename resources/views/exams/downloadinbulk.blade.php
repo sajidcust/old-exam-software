@@ -54,62 +54,62 @@
   <table width="100%">
     <tbody width="100%">
       <tr width="100%">
-        <td style="font-size:12px;" width="100">District</td>
+        <td style="font-size:11px;" width="100">District</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:center;">{{ $student->district_name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->district_name }}</p>
         </td>
         <td width="100"></td>
         <td width="100"></td>
         <td width="20" style="padding-left:20px" rowspan="3">
         @if($student->image != '')
           <?php $image = ltrim($student->image, $student->image[0]); ?>
-          <img style="border:2px solid #ccc;" src="{{ $student->image }}" alt="" width="75"/>
+          <img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="75"/>
         @endif
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="100">Roll No:</td>
+        <td style="font-size:11px;" width="100">Roll No:</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:center;">{{ $student->id }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->id }}</p>
           
         </td>
-        <td style="font-size:12px;" width="100" style="padding-left:10px;">&nbsp;Center Code</td>
+        <td style="font-size:11px;" width="100" style="padding-left:10px;">&nbsp;Center Code</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:center;">{{ $student->center_id }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->center_id }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="100">Class</td>
+        <td style="font-size:11px;" width="100">Class</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:center;">{{ $student->class_name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->class_name }}</p>
         </td>
-        <td width="100" style="padding-left:5px;font-size:12px;">Registration No:</td>
+        <td width="100" style="padding-left:5px;font-size:11px;">Registration No:</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:center;">{{ $student->registration_no }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->registration_no }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="30">Student Name</td>
+        <td style="font-size:11px;" width="30">Student Name</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->name }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="30">Father's Name</td>
+        <td style="font-size:11px;" width="30">Father's Name</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->father_name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->father_name }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="30">Instituion</td>
+        <td style="font-size:11px;" width="30">Instituion</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->institution_name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->institution_name }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:12px;" width="30">Exam Center</td>
+        <td style="font-size:11px;" width="30">Exam Center</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:12px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->center_name }}</p>
+          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->center_name }}</p>
         </td>
       </tr>
     </tbody>
@@ -118,10 +118,10 @@
   <table style="border-collapse: collapse; width: 100%;margin-top:10px;" border="1">
     <thead>
       <tr>
-        <th style="text-align:center;font-size:12px;width: 10%;">S. NO</th>
-        <th style="text-align:center;font-size:12px;width: 30%;">Subject</th>
-        <th style="text-align:center;font-size:12px;width: 35%;">Day and Date</th>
-        <th style="text-align:center;font-size:12px;width: 25%;">Time</th>
+        <th style="text-align:center;font-size:11px;width: 10%;">S. NO</th>
+        <th style="text-align:center;font-size:11px;width: 30%;">Subject</th>
+        <th style="text-align:center;font-size:11px;width: 35%;">Day and Date</th>
+        <th style="text-align:center;font-size:11px;width: 25%;">Time</th>
       </tr>
     </thead>
     <tbody>
@@ -129,10 +129,10 @@
         <?php $subjects = App\Models\Subject::getSubjectDatesheet($student->id, $session_id, $semester_id); ?>
         @foreach($subjects as $subject)
           <tr>
-            <td style="text-align:center;font-size:12px;width: 10%;">{{ $i }}</td>
-            <td style="text-align:center;font-size:12px;width: 30%;">{{ $subject->subject_name }}</td>
-            <td style="text-align:center;font-size:12px;width: 35%;">{{ date_format(date_create($subject->paper_date), "l, d F Y") }}</td>
-            <td style="text-align:center;font-size:12px;width: 25%;">{{ date_format(date_create($subject->paper_starting_time), "h:i A") }} to {{ date_format(date_create($subject->paper_ending_time), "h:i A") }}</td>
+            <td style="text-align:center;font-size:11px;width: 10%;">{{ $i }}</td>
+            <td style="text-align:center;font-size:11px;width: 30%;">{{ $subject->subject_name }}</td>
+            <td style="text-align:center;font-size:11px;width: 35%;">{{ date_format(date_create($subject->paper_date), "l, d F Y") }}</td>
+            <td style="text-align:center;font-size:11px;width: 25%;">{{ date_format(date_create($subject->paper_starting_time), "h:i A") }} to {{ date_format(date_create($subject->paper_ending_time), "h:i A") }}</td>
           </tr>
           <?php $i++; ?>
         @endforeach

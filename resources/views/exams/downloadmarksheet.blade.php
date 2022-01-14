@@ -107,7 +107,12 @@
   <td style="font-size: 15px; width: 23.6042%; text-align: right; height: 10px;">Class:</td>
   <td style="font-size: 15px; width: 15.8565%; text-align: left; padding-left:10px; height: 10px;">
     <span style="text-decoration: underline;"><strong>{{ $student->class_name }}</strong></span></td>
-  <td style="height: 30px; width: 18.711%;" rowspan="3"><img style="margin-left: 10px; border: 3px double #000;" src="img/user_images/1625401000-orig.jpg" alt="" width="70" /></td>
+  <td style="height: 30px; width: 18.711%;" rowspan="3">
+    @if($student->image != '')
+    <?php $image = ltrim($student->image, $student->image[0]); ?>
+      <img style="margin-left: 10px; border: 3px double #000;" src="{{ $image }}" alt="" width="70" />
+    @endif
+  </td>
   <td style="width: 3.56315%; height: 30px;" rowspan="3">&nbsp;</td>
   </tr>
   <tr style="height: 37px;">

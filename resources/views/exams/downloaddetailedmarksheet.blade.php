@@ -87,7 +87,12 @@
 <tr>
 <td style="width:10%;" valign="top"><h4><strong>No.</strong></h4></td>
 <td style="width:70%;padding-left:70px; border-style: none; text-align: center;"><span style="text-align:left;"><img src="img/w.png" width="90" /></span></td>
-<td style="width:20%;text-align: left;"><img style="margin-left: 10px; border: 3px double #000;" src="img/user_images/1625401000-orig.jpg" alt="" width="80" /></td>
+<td style="width:20%;text-align: left;">
+  @if($student->image != '')
+    <?php $image = ltrim($student->image, $student->image[0]); ?>
+    <img style="margin-left: 10px; border: 3px double #000;" src="{{ $image }}" alt="" width="80" />
+  @endif
+</td>
 </tr>
 </tbody>
 </table>
