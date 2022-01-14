@@ -60,8 +60,8 @@
         </td>
         <td width="100"></td>
         <td width="100"></td>
-        <?php $image = ltrim($student->image, $student->image[0]); ?>
-        <td width="20" style="padding-left:20px" rowspan="3"><img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="75"/></td>
+        <?php //$image = ltrim($student->image, $student->image[0]); ?>
+        <td width="20" style="padding-left:20px" rowspan="3"><img style="border:2px solid #ccc;" src="{{ $student->image }}" alt="" width="75"/></td>
       </tr>
       <tr width="100%">
         <td style="font-size:12px;" width="100">Roll No:</td>
