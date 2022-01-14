@@ -219,7 +219,7 @@ class StudentsController extends Controller
                 $students_fees_selection->save();
             }
 
-            return Redirect::to('admin/students/index')
+            return Redirect::to('admin/students/search')
                 ->with('message', 'Fee Details Updated Successfully.');
         } else {
             return Redirect::to('admin/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id'))
@@ -294,7 +294,7 @@ class StudentsController extends Controller
             $semesters = Semester::where('session_id', $request->input('session_id'))->get();
 
             if(count($semesters) == 0){
-                return Redirect::to('admin/students/index')
+                return Redirect::to('admin/students/search')
                     ->with('message', 'The selected session for the user does not contain any semesters. Please add at least one semester to continue.');
             }
 
@@ -350,7 +350,7 @@ class StudentsController extends Controller
                 $studentsemester->save();
             }
 
-            return Redirect::to('admin/students/index')
+            return Redirect::to('admin/students/search')
                 ->with('message', 'New student created successfully.');
         } else {
             return Redirect::to('admin/students/create')
@@ -424,7 +424,7 @@ class StudentsController extends Controller
                 $semesters = Semester::where('session_id', $request->input('session_id'))->get();
 
                 if(count($semesters) == 0){
-                    return Redirect::to('admin/students/index')
+                    return Redirect::to('admin/students/search')
                         ->with('message', 'The selected session for the user does not contain any semesters. Please add at least one semester to continue.');
                 }
 
@@ -481,7 +481,7 @@ class StudentsController extends Controller
                     $studentsemester->save();
                 }
 
-                return Redirect::to('admin/students/index')
+                return Redirect::to('admin/students/search')
                     ->with('message', 'Student updated successfully.');
             } else {
                 return Redirect::to('admin/students/edit/'.$student->id)
