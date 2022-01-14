@@ -567,6 +567,12 @@
                       <p>Create</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{{ url('admin/students/search') }}" class="nav-link {{ $selected_sub_menu == 'search_students' ? 'active open':'' }}">
+                      <i class="far fa-flag nav-icon"></i>
+                      <p>Search</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
 
