@@ -538,4 +538,162 @@ class StudentsController extends Controller
 
          return json_encode($selected_subs);
     }
+
+    public function search() {
+        $this->selected_sub_menu = "search_students";
+        $this->card_title = "Please fill in the fields shown below to search.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('students.search')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function searchstudent(Request $request){
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
+        $this->selected_sub_menu = "search_students";
+        $this->card_title = "View and Manage all students shown below.";
+
+        if(DB::connection()->getDriverName() == 'mysql') {
+            $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
+        }
+
+        if(DB::connection()->getDriverName() == 'sqlite') {
+            $date_of_birth = "strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,";
+        }
+
+        if(request()->ajax())
+        {
+            return datatables()->of(DB::select(DB::raw("
+                        SELECT
+                            s.id,
+                            s.name,
+                            s.father_name,
+                            ".$date_of_birth."
+                            s.dob_in_words,
+                            (CASE  WHEN s.gender=0 THEN 'Male' ELSE 'Female' END) AS gender,
+                            s.home_address,
+                            s.cell_no,
+                            s.email,
+                            s.image,
+                            (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
+                            ss.title,
+                            (
+                                SELECT institutions.name FROM institutions
+                                WHERE s.institution_id = institutions.id
+                            ) AS institution_name,
+                            i.name as center_name,
+                            stds.name as class_name,
+                            s.session_id,
+                            s.created_at,
+                            s.updated_at
+                        FROM students AS s
+                        JOIN sessions AS ss
+                        ON ss.id = s.session_id
+                        JOIN standards as stds
+                        ON stds.id = s.class_id
+                        JOIN institutions AS i
+                        ON i.id = s.center_id
+                        WHERE s.session_id = ". $session_id ."
+                        AND s.class_id = ". $class_id ."
+                        AND s.center_id = ". $center_id ."
+                        ;")))
+                    ->addColumn('image', function($data){
+                        return "<img src='".url($data->image)."' style='height:auto;width:100px;'>";
+                    })
+                    ->addColumn('subjects', function($data){
+                        $result = "";
+                        $subjects = StudentsSubject::join('subjects', 'subjects.id', '=', 'students_subjects.subject_id')->where('students_subjects.student_id', $data->id)->get();
+                        if(count($subjects)){
+
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+
+                            foreach($subjects as $subject){
+                                $result.='<tr style="background:transparent">';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-danger">'.$subject->id.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-secondary">'.$subject->name.'</span></h5></td>';
+                                $result.='</tr>';
+                            }
+
+                            $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
+                        }
+                        return $result;
+                    })
+                    ->addColumn('fees', function($data){
+                        $fees = StudentsFee::join('semesters', 'semesters.id', '=', 'students_fees.semester_id')->where('student_id', $data->id)->orderBy('semesters.id', 'ASC')->get(['students_fees.id', 'semesters.title', 'students_fees.total_amount']);
+
+                        if(count($fees)) {
+
+                            $result = '<table style="margin:0px;" class="table table-sm table-borderless">  
+                                      <tbody>';
+
+                            foreach($fees as $fee){
+                                $fee_selections = StudentsFeesSelection::join('fees', 'fees.id', '=', 'students_fees_selections.fee_id')->where('students_fees_selections.students_fees_id', $fee->id)->orderBy('fees.id', 'ASC')->get(['fees.id', 'fees.title']);
+
+                                $result.='<tr style="background:transparent">';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-warning">'.$fee->title.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5><span style="width:100%;" class="badge badge-primary">'.$fee->total_amount.'</span></h5></td>';
+                                    $result.= '<td style="margin:0px;padding:0px;padding-right:5px;""><h5>';
+
+                                        foreach($fee_selections as $selection){
+                                            $result.='<span style="width:100%;" class="badge badge-danger">'.$selection->title.'</span>';
+                                        }
+                                    $result.='</h5></td>';
+
+                                $result.='</tr>';
+                            }
+
+                            $result.= '</tbody>
+                                    </table>';
+                        } else {
+                            $result = '';
+                        }
+
+                        return $result;
+                    })
+                    ->addColumn('action', function($data){
+                        $button = '<a style="margin-bottom:5px;" href="'.url('admin/students/edit/'.$data->id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Edit</a>';
+                        $button .='&nbsp;&nbsp;';
+                        $button .= '<button style="margin-bottom:5px;" type="button" name="delete" id = "dlt_button" class="btn btn-danger margin-2px btn-sm" data-url="'.route('students.destroy').'" data-studentid="'.$data->id.'" data-token="'.csrf_token().'"><span class="fa fa-window-close"></span>&nbsp;&nbsp;Delete</button>';
+
+                        $semesters = Semester::where('session_id', $data->session_id)->get();
+
+                        foreach($semesters as $semester){
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/students/updatefee/'.$data->id).'/'. $semester->id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
+                        }
+
+                        return $button;
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+        }
+        return view('students.searchstudent')
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
 }

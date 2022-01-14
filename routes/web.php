@@ -81,6 +81,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 
 	Route::get('/students', [StudentsController::class, 'index']);
 	Route::get('/students/index', [StudentsController::class, 'index'])->name('students.index');
+	Route::get('/students/search', [StudentsController::class, 'search'])->name('students.search');
+	Route::post('/students/searchstudent', [StudentsController::class, 'searchstudent'])->name('students.searchstudent');
 	Route::get('/students/create', [StudentsController::class, 'create'])->name('students.create');
 	Route::post('/students/store', [StudentsController::class, 'store'])->name('students.store');
 	Route::post('/students/destroy', [StudentsController::class, 'destroy'])->name('students.destroy');
