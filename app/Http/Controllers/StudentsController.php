@@ -657,7 +657,7 @@ class StudentsController extends Controller
             $i++;
         }
 
-         return json_encode($selected_subs);
+        return json_encode($selected_subs);
     }
 
     public function search() {

@@ -203,29 +203,28 @@
     var url = "{{ route('students.getsubjectsgroupdata') }}";
 
     $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    },
-            type: "POST",
-            url: url,
-            data: {class_id:class_id},
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: "POST",
+        url: url,
+        data: {class_id:class_id},
+        beforeSend: function()
+        {
+          $('#modal-danger').modal('hide');
+          Pace.start();
+        },
+        complete: function() {
+          Pace.stop();
+          $('#modal-danger').modal('hide');
+        },
+        success: function(data)
+        {
+          data_arr = JSON.parse(data);
 
-            beforeSend: function()
-            {
-              $('#modal-danger').modal('hide');
-              Pace.start();
-            },
-            complete: function() {
-              Pace.stop();
-              $('#modal-danger').modal('hide');
-            },
-            success: function(data)
-            {
-              data_arr = JSON.parse(data);
-
-              $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
-            }
-        });
+          $('select[name="subject_id[]"]').val(data_arr).trigger("change");
+        }
+    });
   });
 
   $(document).ready(function(){
@@ -233,29 +232,29 @@
     var url = "{{ route('students.getsubjectsgroupdata') }}";
 
     $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    },
-            type: "POST",
-            url: url,
-            data: {class_id:class_id},
-
-            beforeSend: function()
-            {
-              $('#modal-danger').modal('hide');
-              Pace.start();
-            },
-            complete: function() {
-              Pace.stop();
-              $('#modal-danger').modal('hide');
-            },
-            success: function(data)
-            {
-              data_arr = JSON.parse(data);
-
-              $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
-            }
-        });
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: "POST",
+        url: url,
+        data: {
+          class_id: class_id
+        },
+        beforeSend: function()
+        {
+          $('#modal-danger').modal('hide');
+          Pace.start();
+        },
+        complete: function() {
+          Pace.stop();
+          $('#modal-danger').modal('hide');
+        },
+        success: function(data)
+        {
+          data_arr = JSON.parse(data);
+          $('select[name="subject_id[]"]').val(data_arr).trigger('change');
+        }
+    });
 
   });
 

@@ -223,7 +223,7 @@
             {
               data_arr = JSON.parse(data);
 
-              $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
+              $('select[name="subject_id[]"]').val(data_arr).trigger("change");
             }
         });
   });
@@ -253,7 +253,7 @@
             {
               data_arr = JSON.parse(data);
 
-              $('select[name="subject_id[]"]').select2().val(data_arr).trigger("change");
+              $('select[name="subject_id[]"]').val(data_arr).trigger("change");
             }
         });
 

@@ -66,16 +66,31 @@
                   {{ csrf_field() }}
                   <div class="card-body">
                     <div class="row">
-                      <div class="col-lg-6">
+                      <div class="col-lg-3">
                         <div class="form-group">
-                            <label for="labelInputSelectDistrict">Select Session</label>
-                            <select class="custom-select rounded-0 select2" id="labelInputSelectDistrict" name="session_id">
+                            <label for="labelInputSelectSession">Select Session</label>
+                            <select class="custom-select rounded-0 select2" id="labelInputSelectSession" name="session_id">
                                 <option value="">Select Session</option> 
                                 @foreach($sessions as $session)
                                     @if($session->id == Request::old('session_id'))
                                         <option selected value="{{ $session->id }}">{{ $session->title }}</option>
                                     @else
                                         <option value="{{ $session->id }}">{{ $session->title }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                         </div>
+                        </div>
+                        <div class="col-lg-3">
+                        <div class="form-group">
+                            <label for="labelInputSelectDistrict">Select District</label>
+                            <select class="custom-select rounded-0 select2" id="labelInputSelectDistrict" name="district_id">
+                                <option value="">Select District</option> 
+                                @foreach($districts as $district)
+                                    @if($district->id == Request::old('district_id'))
+                                        <option selected value="{{ $district->id }}">{{ $district->name }}</option>
+                                    @else
+                                        <option value="{{ $district->id }}">{{ $district->name }}</option>
                                     @endif
                                 @endforeach
                             </select>

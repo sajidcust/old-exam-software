@@ -44,9 +44,11 @@ class ImportExportsController extends Controller
         $this->card_title = "Export data from here to external sources.";
 
         $sessions = Session::all();
+        $districts = District::all();
 
         return view('importsexports.export')
         	->with('sessions', $sessions)
+        	->with('districts', $districts)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -449,11 +451,12 @@ class ImportExportsController extends Controller
 			    	$setting->controller_image,  
 			    	$setting->controllers_message,  
 			    	$setting->deputy_controller_name,  
+			    	$setting->deputy_controller_signature,  
 	        		$setting->created_at, 
 	        		$setting->updated_at
 	        	];
 	        	
-	        	DB::connection('sqlite')->insert('INSERT INTO settings (id, board_full_name, minister_name, minister_image, ministers_message, secretary_name, secretary_image, secretarys_message, controller_name, controller_image, controllers_message, deputy_controller_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', $data);
+	        	DB::connection('sqlite')->insert('INSERT INTO settings (id, board_full_name, minister_name, minister_image, ministers_message, secretary_name, secretary_image, secretarys_message, controller_name, controller_image, controllers_message, deputy_controller_name, deputy_controller_signature, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', $data);
 	        } 
 	    }
 
@@ -496,13 +499,14 @@ class ImportExportsController extends Controller
         ]);
 
     	$session_id = $request->input('session_id');
+    	$district_id = $request->input('district_id');
     	$skip_records = $request->input('skip_records');
     	$limit_records = $request->input('limit_records');
     	$count_records = $request->input('count_records');
 
-    	if($session_id != '' && $skip_records != '' && $limit_records != ''){
+    	if($session_id != '' && $district_id != '' && $skip_records != '' && $limit_records != ''){
 	    	if($skip_records >= $count_records) {	
-	    		$students = Student::where('session_id', $session_id)->orderBy('id', 'ASC')->skip($skip_records)->take($limit_records)->get();
+	    		$students = Student::where('session_id', $session_id)->where('district_id', $district_id)->orderBy('id', 'ASC')->skip($skip_records)->take($limit_records)->get();
 
 	    		foreach($students as $student){
 	    			$data = [
