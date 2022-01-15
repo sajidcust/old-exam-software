@@ -36,19 +36,45 @@ class DataEntryStudentsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function searchbycenter() {
+        $this->selected_sub_menu = "search_index";
+        $this->card_title = "Please fill in the fields shown below to search.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('dataentrystudents.search')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function searchedstudents(Request $request)
     {
-        $this->selected_sub_menu = "students_index";
+        $this->selected_sub_menu = "search_students";
         $this->card_title = "View and Manage all students shown below.";
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
+            $registration_no = "CONCAT(s.session_id, '-', s.class_id, '-', s.id) AS registration_no,";
         }
 
         if(DB::connection()->getDriverName() == 'sqlite') {
             $date_of_birth = "strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,";
+            $registration_no = "(s.session_id || '-' || s.class_id || '-' || s.id) AS registration_no,";
         }
-
 
         if(request()->ajax())
         {
@@ -59,11 +85,14 @@ class DataEntryStudentsController extends Controller
                             s.father_name,
                             ".$date_of_birth."
                             s.dob_in_words,
+                            ".$registration_no."
                             (CASE  WHEN s.gender=0 THEN 'Male' ELSE 'Female' END) AS gender,
                             s.home_address,
                             s.cell_no,
                             s.email,
                             s.image,
+                            s.class_id,
+                            s.center_id,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             (
@@ -81,7 +110,11 @@ class DataEntryStudentsController extends Controller
                         JOIN standards as stds
                         ON stds.id = s.class_id
                         JOIN institutions AS i
-                        ON i.id = s.center_id;")))
+                        ON i.id = s.center_id
+                        WHERE s.session_id = ". $session_id ."
+                        AND s.class_id = ". $class_id ."
+                        AND s.center_id = ". $center_id ."
+                        ;")))
                     ->addColumn('image', function($data){
                         return "<img src='".url($data->image)."' style='height:auto;width:100px;'>";
                     })
@@ -140,14 +173,14 @@ class DataEntryStudentsController extends Controller
                         return $result;
                     })
                     ->addColumn('action', function($data){
-                        $button = '<a style="margin-bottom:5px;" href="'.url('dataentry/students/edit/'.$data->id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Edit</a>';
+                        $button = '<a style="margin-bottom:5px;" href="'.url('dataentry/students/edit/'.$data->id).'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Edit</a>';
                         $button .='&nbsp;&nbsp;';
                         $button .= '<button style="margin-bottom:5px;" type="button" name="delete" id = "dlt_button" class="btn btn-danger margin-2px btn-sm" data-url="'.route('students.destroy').'" data-studentid="'.$data->id.'" data-token="'.csrf_token().'"><span class="fa fa-window-close"></span>&nbsp;&nbsp;Delete</button>';
 
                         $semesters = Semester::where('session_id', $data->session_id)->get();
 
                         foreach($semesters as $semester){
-                            $button .= '<a style="margin-bottom:5px;" href="'.url('dataentry/students/updatefee/'.$data->id).'/'. $semester->id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/students/updatefeebysearch/'.$data->id).'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
                         }
 
                         return $button;
@@ -156,6 +189,9 @@ class DataEntryStudentsController extends Controller
                     ->make(true);
         }
         return view('dataentrystudents.index')
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -210,6 +246,9 @@ class DataEntryStudentsController extends Controller
             ->with('semester', $semester)
             ->with('student', $student)
             ->with('studentsfee', $students_fees)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -218,8 +257,41 @@ class DataEntryStudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
+    public function updatefeestepsearched($id, $semester_id, $session_id, $class_id, $center_id)
+    {
+        $this->selected_sub_menu = "students_create";
+        $this->card_title = "Please fill in the form below to update fee details";
+
+        $students_fees = StudentsFee::where('student_id', $id)->where('semester_id', $semester_id)->first();
+
+
+        $fees = Fee::all();
+        $banks = Bank::all();
+        $semester = Semester::find($semester_id);
+        $student = Student::find($id);
+
+        return view('dataentrystudents.updatefeesteps')
+            ->with('fees', $fees)
+            ->with('banks', $banks)
+            ->with('semester', $semester)
+            ->with('student', $student)
+            ->with('studentsfee', $students_fees)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
 
     public function storefee(Request $request){
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $validator = Validator::make($request->all(), StudentsFee::$rules);
         if ($validator->passes()) {
             StudentsFeesSelection::where('student_id', $request->input('student_id'))->where('semester_id', $request->input('semester_id'))->delete();
@@ -247,22 +319,42 @@ class DataEntryStudentsController extends Controller
             }
 
             if($request->input('is_step')){
-                return Redirect::to('dataentry/students/index')
-                    ->with('message', 'Student Details Updated Successfully.');
+                if($session_id && $class_id && $center_id){
+                    return redirect()->route('destudents.searchedstudents', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Student Details Updated Successfully.');
+                } else {
+                    return Redirect::to('dataentry/students/index')
+                        ->with('message', 'Student Details Updated Successfully.');
+                }
             } else {
-                return Redirect::to('dataentry/students/index')
-                    ->with('message', 'Fee Details Updated Successfully.');
+                if($session_id && $class_id && $center_id){
+                    return redirect()->route('destudents.searchedstudents', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Fee Details Updated Successfully.');
+                } else {
+                    return Redirect::to('dataentry/students/index')
+                        ->with('message', 'Fee Details Updated Successfully.');
+                }
             }
         } else {
 
             if($request->input('is_step')){
-                return Redirect::to('dataentry/students/updatefeestep/'.$request->input('student_id').'/'.$request->input('semester_id'))
-                ->withErrors($validator)
-                ->withInput($request->all());
+                if($session_id && $class_id && $center_id) {
+                    return Redirect::to('dataentry/students/updatefeestep/'.$request->input('student_id').'/'.$request->input('semester_id').'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                    ->withErrors($validator)
+                    ->withInput($request->all());
+                } else {
+                    return Redirect::to('dataentry/students/updatefeestep/'.$request->input('student_id').'/'.$request->input('semester_id'))
+                    ->withErrors($validator)
+                    ->withInput($request->all());
+                }
             } else {
-                return Redirect::to('dataentry/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id'))
-                ->withErrors($validator)
-                ->withInput($request->all());
+                if($session_id && $class_id && $center_id) {
+                    return Redirect::to('dataentry/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id').'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                    ->withErrors($validator)
+                    ->withInput($request->all());
+                } else {
+                    return Redirect::to('dataentry/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id'))
+                    ->withErrors($validator)
+                    ->withInput($request->all());
+                }
             }   
         }
     }
@@ -272,6 +364,31 @@ class DataEntryStudentsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function createsearched($session_id, $class_id, $center_id)
+    {
+        $this->selected_sub_menu = "students_create";
+        $this->card_title = "Please fill in the form to create a new student.";
+        $institutions = Institution::all();
+        $sessions = Session::all();
+        $subjects = Subject::all();
+        $standards = Standard::all();
+        return view('dataentrystudents.create')
+            ->with('institutions', $institutions)
+            ->with('sessions', $sessions)
+            ->with('subjects', $subjects)
+            ->with('standards', $standards)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
     public function create()
     {
         $this->selected_sub_menu = "students_create";
@@ -327,13 +444,17 @@ class DataEntryStudentsController extends Controller
      */
     public function store(Request $request)
     {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $validator = Validator::make($request->all(), Student::$rules);
         if ($validator->passes()) {
 
             $semesters = Semester::where('session_id', $request->input('session_id'))->get();
 
             if(count($semesters) == 0){
-                return Redirect::to('dataentry/students/index')
+                return Redirect::to('dataentry/students/searchbycenter')
                     ->with('message', 'The selected session for the user does not contain any semesters. Please add at least one semester to continue.');
             }
 
@@ -391,12 +512,23 @@ class DataEntryStudentsController extends Controller
 
             $semester = Semester::where('session_id', $student->session_id)->orderBy('id', 'ASC')->first();
 
-            return Redirect::to('dataentry/students/updatefeestep/'.$student->id.'/'.$semester->id)
-                ->with('message', 'New student created successfully. Please update the fee details to continue.');
+            if($session_id && $class_id && $center_id){
+                return Redirect::to('dataentry/students/updatefeestepsearched/'.$student->id.'/'.$semester->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                    ->with('message', 'New student created successfully. Please update the fee details to continue.');
+            } else {
+                return Redirect::to('dataentry/students/updatefeestep/'.$student->id.'/'.$semester->id)
+                    ->with('message', 'New student created successfully. Please update the fee details to continue.');
+            }
         } else {
-            return Redirect::to('dataentry/students/create')
-                ->withErrors($validator)
-                ->withInput($request->all());      
+            if($session_id && $class_id && $center_id) {
+                return Redirect::to('dataentry/students/create/'.$session_id.'/'.$class_id.'/'.$center_id)
+                    ->withErrors($validator)
+                    ->withInput($request->all());      
+            } else {
+                return Redirect::to('dataentry/students/create')
+                    ->withErrors($validator)
+                    ->withInput($request->all()); 
+            }
         }
     }
 
@@ -417,7 +549,7 @@ class DataEntryStudentsController extends Controller
      * @param  \App\Models\Province  $province
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, $session_id, $class_id, $center_id)
     {
         $this->selected_sub_menu = "students_create";
         $this->card_title = "Please fill in the form to update the student.";
@@ -439,6 +571,9 @@ class DataEntryStudentsController extends Controller
             ->with('sessions', $sessions)
             ->with('subjects', $subjects)
             ->with('standards', $standards)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('students_subjects', $students_subjects)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
@@ -457,6 +592,10 @@ class DataEntryStudentsController extends Controller
      */
     public function update(Request $request)
     {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $student = Student::find($request->input('student_id'));
         if($student){
             $validator = Validator::make($request->all(), Student::$rules_edit);
@@ -524,10 +663,10 @@ class DataEntryStudentsController extends Controller
 
                 $semester = Semester::where('session_id', $student->session_id)->orderBy('id', 'ASC')->first();
 
-                return Redirect::to('dataentry/students/updatefeestep/'.$student->id.'/'.$semester->id)
+                return Redirect::to('dataentry/students/updatefeestep/'.$student->id.'/'.$semester->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
                     ->with('message', 'Student updated successfully. Please update the fee details to continue.');
             } else {
-                return Redirect::to('dataentry/students/edit/'.$student->id)
+                return Redirect::to('dataentry/students/edit/'.$student->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
                     ->withErrors($validator)
                     ->withInput($request->all());      
             }

@@ -58,15 +58,20 @@
 
 </head>
 <body>
-  <?php $std_counter = 1; ?>
-  @foreach($standards as $standard)
+  @if($standard)
+    <?php $std_counter = 1; ?>
     @foreach($subjects as $subject)
-    <?php $students = App\Models\Student::getStudentsByCAndSubs($center->id, $standard->id, $subject->id, $session->id, $semester->id); ?>
+      <?php $students = App\Models\Student::getStudentsByCAndSubs($center->id, $standard->id, $subject->id, $session->id, $semester->id); ?>
+      
+      @if($std_counter != 1)
+        <div class="page_break"></div>
+      @endif
+
       @if(count($students)>0)
         <table width="100%">
           <tr>
               <td style="padding-top:20px;" valign="top" align="center">
-                <h1 style="padding:0px;margin:0px;text-align:center;font-size:18px;font-weight:600;">BOARD OF ELEMENTARY EXAMINATION, GB {{ strtoupper($session->title) }}</h1>
+                <h1 style="padding:0px;margin:0px;text-align:center;font-size:18px;font-weight:600;">{{ strtoupper($setting->board_full_name) }} {{ strtoupper($session->title) }}</h1>
                 <h1 style="padding:0px;margin:0px;text-align:center;font-size:15px;font-weight:600;text-decoration:underline;">{{ strtoupper($semester->title) }} EXAMINATION ATTENDANCE/AWARD SHEET</h1>
               </td>
           </tr>
@@ -148,12 +153,12 @@
           </thead>
         </table>
 
-        <div class="page_break"></div>
         
+        
+        <?php $std_counter++; ?>
       @endif
     @endforeach
-    <?php $std_counter++; ?>
-  @endforeach
+  @endif
 
   <br/>
 

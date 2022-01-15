@@ -56,52 +56,52 @@
       <tr width="100%">
         <td style="font-size:11px;" width="100">District</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->district_name }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->district_name }}</p>
         </td>
         <td width="100"></td>
         <td width="100"></td>
         <td width="20" style="padding-left:20px" rowspan="3">
         @if($student->image != '')
           <?php $image = ltrim($student->image, $student->image[0]); ?>
-          <img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="75"/>
+          <img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="70"/>
         @endif
         </td>
       </tr>
       <tr width="100%">
         <td style="font-size:11px;" width="100">Roll No:</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->id }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->id }}</p>
           
         </td>
         <td style="font-size:11px;" width="100" style="padding-left:10px;">&nbsp;Center Code</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->center_id }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->center_id }}</p>
         </td>
       </tr>
       <tr width="100%">
         <td style="font-size:11px;" width="100">Class</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->class_name }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->class_name }}</p>
         </td>
         <td width="100" style="padding-left:5px;font-size:11px;">Registration No:</td>
         <td width="100">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->registration_no }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:center;">{{ $student->registration_no }}</p>
         </td>
       </tr>
       <tr width="100%">
         <td style="font-size:11px;" width="30">Student Name</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->name }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->name }}</p>
         </td>
       </tr>
       <tr width="100%">
         <td style="font-size:11px;" width="30">Father's Name</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->father_name }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->father_name }}</p>
         </td>
       </tr>
       <tr width="100%">
-        <td style="font-size:11px;" width="30">Instituion</td>
+        <td style="font-size:11px;padding:0px;" width="30">Instituion</td>
         <td width="70" colspan="4">
           <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->institution_name }}</p>
         </td>
@@ -109,7 +109,7 @@
       <tr width="100%">
         <td style="font-size:11px;" width="30">Exam Center</td>
         <td width="70" colspan="4">
-          <p style="margin:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->center_name }}</p>
+          <p style="margin:0px;padding:0px;border:1px solid #000;font-size:11px; padding: 0px;text-align:left;padding-left:5px;">{{ $student->center_name }}</p>
         </td>
       </tr>
     </tbody>
@@ -139,18 +139,31 @@
     </tbody>
   </table>
 
-    <table width="100%">
-      <tbody>
-        <tr>
-          <td>
-            <img src="img/slip_note.jpg" alt="" width="60%"/>
-          </td>
-          <td>
-            <img src="img/controller_signature.jpg" alt="" width="20%"/>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <table style="margin-top:5px;" width="100%">
+    <tbody>
+      <tr>
+        <td>
+          <img src="img/slip_note.jpg" alt="" width="55%"/>
+        </td>
+        <td style="text-align: center;">
+          @if($setting->deputy_controller_signature != '')
+            <?php $dcsi = ltrim($setting->deputy_controller_signature, $setting->deputy_controller_signature[0]); ?>
+            <img src="{{ $dcsi }}" alt="" width="60"/>
+          @else
+            <img src="img/controller_signature.jpg" alt="" width="60"/>
+          @endif
+        </td>
+      </tr>
+      <tr>
+        <td>
+          &nbsp;
+        </td>
+        <td style="text-align: center;">
+          <h5 style="margin:0px;padding:0px;">Deputy Controller</h5>
+        </td>
+      </tr>
+    </tbody>
+  </table>
     <br>
     @if($num%2)
       <hr style="margin-left:-45px;border:none;border-top:2px dashed #000;color:#fff;background-color:#fff;height:1px;width:120%;">

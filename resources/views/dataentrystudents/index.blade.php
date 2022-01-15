@@ -217,8 +217,17 @@
             processing:true,
             serverSide:true,
             ajax:{
-              url: "{{ route('destudents.index') }}",
-            },
+	        	headers: {
+	                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	              },
+	              data: {
+	                session_id:"{{ $session_id }}",
+	                class_id:"{{ $class_id }}",
+	                center_id:"{{ $center_id }}",
+	              },
+	        	  url: "{{ route('destudents.searchedstudents') }}",
+	        	  type:"GET"
+	        },
             columns:[
               {
                 data: 'id',

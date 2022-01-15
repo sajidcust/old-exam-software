@@ -4,6 +4,9 @@
 @section('content')
 	<!-- Content Header (Page header) -->
     <section class="content-header">
+      @if (Session::has('message'))
+          <div class="callout callout-success" role="alert">{{ Session::get('message') }}</div>
+      @endif
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
@@ -41,12 +44,12 @@
 	              </div>
 	            @endif
               <!-- form start -->
-              <form id="quickForm_genbulk" method="post" action="{{ route('exams.generateawardsheet') }}">
+              <form id="quickForm_genbulk" method="get" action="{{ route('exams.generateslipsbysearch') }}">
                 {{ csrf_field() }}
                 <div style="padding-left:20px;padding-right: 20px;">
                   <br>    
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="form-group">
                           <label for="labelInputSelectSession">Select Session<i class="fa fa-star-of-life required-label"></i></label>
                           <select class="custom-select rounded-0 select2" id="labelInputSelectSession" name="session_id">
@@ -61,7 +64,7 @@
                           </select>
                        </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="form-group">
                         <label for="labelInputSelectSemester">Select Semester<i class="fa fa-star-of-life required-label"></i></label>
                           <select class="custom-select rounded-0 select2" id="labelInputSelectSemester" name="semester_id">
@@ -69,7 +72,7 @@
                           </select>
                        </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="form-group">
                           <label for="labelInputSelectClass">Select Class<i class="fa fa-star-of-life required-label"></i></label>
                           <select class="custom-select rounded-0 select2" id="labelInputSelectClass" name="class_id">
@@ -79,6 +82,21 @@
                                       <option selected value="{{ $standard->id }}">{{ $standard->name }}</option>
                                   @else
                                       <option value="{{ $standard->id }}">{{ $standard->name }}</option>
+                                  @endif
+                              @endforeach
+                          </select>
+                       </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <div class="form-group">
+                          <label for="labelInputSelectCenter">Select Center<i class="fa fa-star-of-life required-label"></i></label>
+                          <select class="custom-select rounded-0 select2" id="labelInputSelectCenter" name="center_id">
+                              <option value="">Select Center</option> 
+                              @foreach($centers as $center)
+                                  @if($center->id == Request::old('center_id'))
+                                      <option selected value="{{ $center->id }}">{{ $center->name }}</option>
+                                  @else
+                                      <option value="{{ $center->id }}">{{ $center->name }}</option>
                                   @endif
                               @endforeach
                           </select>
@@ -111,7 +129,8 @@
 
 @push('scripts')
 <script>
-	$('#quickForm_genbulk select[name="session_id"]').on('change', function(){
+
+  $('#quickForm_genbulk select[name="session_id"]').on('change', function(){
     var session_id = $(this).val();
 
     $('select[name="semester_id"]').select2({
@@ -151,6 +170,9 @@
           required: true
         },
         semester_id: {
+          required: true
+        },
+        center_id: {
           required: true
         },
         class_id: {

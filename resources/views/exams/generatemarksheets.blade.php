@@ -33,9 +33,25 @@
 
             <div class="card">
               <div class="card-header row">
-              	<div class="col-lg-12">
-                	<h3 class="card-title custom-card-title">{{ $card_title }}</h3>
-              	</div>
+                <div class="col-lg-4">
+                  <h3 class="card-title custom-card-title">{{ $card_title }}</h3>
+                </div>
+                <div class="col-lg-8">
+                  <form id="quickForm_genbulk" method="post" action="{{ route('exams.downloadalldetailedmarksheets') }}">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="session_id" value="{{ $session_id }}">
+                    <input type="hidden" name="class_id" value="{{ $class_id }}">
+                    <input type="hidden" name="center_id" value="{{ $center_id }}">
+                    <button style="margin-left:10px;" type="submit" class="btn btn-warning custom-pull-right"><span class="fa fa-cloud-download-alt"></span>&nbsp;&nbsp;&nbsp;Download All Detailed Marksheet</button>
+                  </form>
+                  <form id="quickForm_genbulk" method="post" action="{{ route('exams.downloadallmarksheets') }}">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="session_id" value="{{ $session_id }}">
+                    <input type="hidden" name="class_id" value="{{ $class_id }}">
+                    <input type="hidden" name="center_id" value="{{ $center_id }}">
+                    <button type="submit" class="btn btn-primary custom-pull-right"><span class="fa fa-cloud-download-alt"></span>&nbsp;&nbsp;&nbsp;Download All Marksheet Certificate</button>
+                  </form>
+                </div>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -101,74 +117,6 @@
 
 @push('scripts')
 <script>
-	$(document).ready(function(){
-		$('body').on('click', '#dlt_button', function (){
-			id = $(this).data('studentid');
-			url = $(this).data('url');
-
-			$.confirm({
-			    title: 'Are you sure?',
-			    content: 'Simple confirm!',
-			    buttons: {
-			        yes: {
-			            text: 'Yes',
-			            btnClass: 'btn-red',
-			            keys: ['enter', 'shift'],
-			            action: function(){
-			                $.ajax({
-					    		headers: {
-								    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-								},
-				                type: "POST",
-				                url: url,
-				                data: {id:id},
-
-				                beforeSend: function()
-				                {
-				                	$('#modal-danger').modal('hide');
-				                	Pace.start();
-				                },
-				                complete: function() {
-				                	Pace.stop();
-				                	$('#modal-danger').modal('hide');
-				                },
-				                success: function(data)
-				                {
-				                	if(data['success'] == 'true'){
-				                		var oTable = $('#manageDatatable').dataTable(); 
-										oTable.fnDraw(false);
-										var successToast = $(document).Toasts('create', {
-											class: 'bg-success',
-									        title: 'Success!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
-				                	} else {
-				                		var errorToast = $(document).Toasts('create', {
-											class: 'bg-danger',
-									        title: 'Oops!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
-				                	}
-				                }
-				            });
-			            }
-			        },
-			        no: {
-			            text: 'No',
-			            btnClass: 'btn-grey',
-			            keys: ['enter', 'shift'],
-			            action: function(){
-
-			            }
-			        }
-			    }
-			});
-		});
-	});	
 
 	  $(document).ready(function() {
         $('#manageDatatable').DataTable({
@@ -213,7 +161,16 @@
             processing:true,
             serverSide:true,
             ajax:{
-              url: "{{ route('exams.generatemarksheets') }}",
+              headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  data: {
+                    session_id:"{{ $session_id }}",
+                    class_id:"{{ $class_id }}",
+                    center_id:"{{ $center_id }}"
+                  },
+                url: "{{ route('exams.generatemarksheets') }}",
+                type:"GET"
             },
             columns:[
               {

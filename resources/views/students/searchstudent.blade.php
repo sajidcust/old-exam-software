@@ -126,8 +126,9 @@
 								},
 				                type: "POST",
 				                url: url,
-				                data: {id:id},
-
+				                data: {
+				                	id:id,
+				                },
 				                beforeSend: function()
 				                {
 				                	$('#modal-danger').modal('hide');
@@ -258,15 +259,18 @@
               },
               {
                 data: 'gender',
-                name: 'gender'
+                name: 'gender',
+                visible:false
               },
               {
                 data: 'home_address',
-                name: 'home_address'
+                name: 'home_address',
+                visible:false
               },
               {
                 data: 'cell_no',
-                name: 'cell_no'
+                name: 'cell_no',
+                visible: false
               },
               {
                 data: 'email',

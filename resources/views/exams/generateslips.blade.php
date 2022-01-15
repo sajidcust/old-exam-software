@@ -37,34 +37,13 @@
                 	<h3 class="card-title custom-card-title">{{ $card_title }}</h3>
               	</div>
               	<div class="col-lg-8">
-	              	<form id="quickForm_genbulk" method="post" action="{{ route('exams.generateinbulk') }}">
+	              	<form id="quickForm_genbulk" method="post" action="{{ route('exams.downloadall') }}">
 	              		{{ csrf_field() }}
-	              		<div class="row">
-	              			<div class="col-lg-5">
-	              				<div class="form-group">
-			                      <select class="custom-select rounded-0 select2" id="labelInputSelectSession" name="session_id">
-			                          <option value="">Select Session</option> 
-			                          @foreach($sessions as $session)
-			                              @if($session->id == Request::old('session_id'))
-			                                  <option selected value="{{ $session->id }}">{{ $session->title }}</option>
-			                              @else
-			                                  <option value="{{ $session->id }}">{{ $session->title }}</option>
-			                              @endif
-			                          @endforeach
-			                      </select>
-			                   </div>
-	              			</div>
-	              			<div class="col-lg-5">
-	              				<div class="form-group">
-			                      <select class="custom-select rounded-0 select2" id="labelInputSelectSemester" name="semester_id">
-			                          <option selected value="">Select Semester</option>
-			                      </select>
-			                   </div>
-	              			</div>
-	              			<div class="col-lg-2">
-	              				<input id="submitBtn" type="submit" class="btn btn-success" value="Generate In Bulk">
-	              			</div>
-	              		</div>
+                    <input type="hidden" name="session_id" value="{{ $session_id }}">
+                    <input type="hidden" name="semester_id" value="{{ $semester_id }}">
+                    <input type="hidden" name="class_id" value="{{ $class_id }}">
+                    <input type="hidden" name="center_id" value="{{ $center_id }}">
+	              		<button type="submit" class="btn btn-info custom-pull-right"><span class="fa fa-cloud-download-alt"></span>&nbsp;&nbsp;&nbsp;Download All</button>
 	              	</form>
               	</div>
               </div>
@@ -132,74 +111,6 @@
 
 @push('scripts')
 <script>
-	$(document).ready(function(){
-		$('body').on('click', '#dlt_button', function (){
-			id = $(this).data('studentid');
-			url = $(this).data('url');
-
-			$.confirm({
-			    title: 'Are you sure?',
-			    content: 'Simple confirm!',
-			    buttons: {
-			        yes: {
-			            text: 'Yes',
-			            btnClass: 'btn-red',
-			            keys: ['enter', 'shift'],
-			            action: function(){
-			                $.ajax({
-					    		headers: {
-								    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-								},
-				                type: "POST",
-				                url: url,
-				                data: {id:id},
-
-				                beforeSend: function()
-				                {
-				                	$('#modal-danger').modal('hide');
-				                	Pace.start();
-				                },
-				                complete: function() {
-				                	Pace.stop();
-				                	$('#modal-danger').modal('hide');
-				                },
-				                success: function(data)
-				                {
-				                	if(data['success'] == 'true'){
-				                		var oTable = $('#manageDatatable').dataTable(); 
-										oTable.fnDraw(false);
-										var successToast = $(document).Toasts('create', {
-											class: 'bg-success',
-									        title: 'Success!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
-				                	} else {
-				                		var errorToast = $(document).Toasts('create', {
-											class: 'bg-danger',
-									        title: 'Oops!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
-				                	}
-				                }
-				            });
-			            }
-			        },
-			        no: {
-			            text: 'No',
-			            btnClass: 'btn-grey',
-			            keys: ['enter', 'shift'],
-			            action: function(){
-
-			            }
-			        }
-			    }
-			});
-		});
-	});	
 
 	  $(document).ready(function() {
         $('#manageDatatable').DataTable({
@@ -244,7 +155,20 @@
             processing:true,
             serverSide:true,
             ajax:{
-              url: "{{ route('exams.generateslips') }}",
+              
+            },
+            ajax:{
+              headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  data: {
+                    session_id:"{{ $session_id }}",
+                    class_id:"{{ $class_id }}",
+                    center_id:"{{ $center_id }}",
+                    semester_id:"{{ $semester_id }}"
+                  },
+                url: "{{ route('exams.generateslipsbysearch') }}",
+                type:"GET"
             },
             columns:[
               {
@@ -347,75 +271,6 @@
 	        ],
         });
     });
-
-	///---------------------------------------------------------------------
-
-	$('#quickForm_genbulk select[name="session_id"]').on('change', function(){
-    var session_id = $(this).val();
-
-    $('select[name="semester_id"]').select2({
-      ajax: {
-        url: "{{ route('datesheets.getsemesters') }}",
-        dataType: 'json',
-        "type" : "POST",
-        data: function (params) {
-            return {
-              _token: '{{ csrf_token() }}',
-              session_id:session_id,
-              search: params.term // search term
-            };
-          },
-          beforeSend: function()
-          {
-            Pace.start();
-          },
-          complete: function() {
-            Pace.stop();
-          },
-          processResults: function (response) {
-            console.log(response);
-            return {
-              results: response
-            };
-          },
-          cache: true
-      }
-    });
-    
-  });
-
-	var validatevar = $('#quickForm_genbulk').validate({
-      rules: {
-        session_id: {
-          required: true
-        },
-        semester_id: {
-          required: true
-        }
-      },
-      errorElement: 'span',
-      errorPlacement: function (error, element) {
-        error.addClass('invalid-feedback');
-        element.closest('.form-group').append(error);
-      },
-      highlight: function (element, errorClass, validClass) {
-        $(element).addClass('is-invalid');
-        $(element).removeClass('is-valid');
-      },
-      unhighlight: function (element, errorClass, validClass) {
-        $(element).removeClass('is-invalid');
-        $(element).addClass('is-valid');
-      },
-      submitHandler: function(form) {
-        form.submit();
-      }
-   });
-
-  $('.select2').select2({
-      theme: 'bootstrap4'
-  }).change(function(){
-      $('#quickForm_genbulk').valid();
-  });
 
 </script>
 

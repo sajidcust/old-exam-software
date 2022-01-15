@@ -44,7 +44,8 @@
 	                	<thead>
 	                  <tr>
 	                    <th>ID</th>
-	                    <th>Center</th>
+                      <th>Center</th>
+	                    <th>Class</th>
 	                    <th>Tehsil</th>
 	                    <th>Action</th>
 	                  </tr>
@@ -121,22 +122,22 @@
 				                {
 				                	if(data['success'] == 'true'){
 				                		var oTable = $('#manageDatatable').dataTable(); 
-										oTable.fnDraw(false);
-										var successToast = $(document).Toasts('create', {
-											class: 'bg-success',
-									        title: 'Success!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
-				                	} else {
-				                		var errorToast = $(document).Toasts('create', {
-											class: 'bg-danger',
-									        title: 'Oops!',
-									        autohide: true,
-									        delay: 2000,
-									        body: data['message']
-									      });
+        										oTable.fnDraw(false);
+        										var successToast = $(document).Toasts('create', {
+        											class: 'bg-success',
+        									        title: 'Success!',
+        									        autohide: true,
+        									        delay: 2000,
+        									        body: data['message']
+        									      });
+        				                	} else {
+        				                		var errorToast = $(document).Toasts('create', {
+        											class: 'bg-danger',
+        									        title: 'Oops!',
+        									        autohide: true,
+        									        delay: 2000,
+        									        body: data['message']
+        									      });
 				                	}
 				                }
 				            });
@@ -204,7 +205,8 @@
               url: "{{ route('exams.generateawardsheet') }}",
               data: { 
                 session_id: '{{ $session_id }}',
-                semester_id: '{{ $semester_id }}'
+                semester_id: '{{ $semester_id }}',
+                class_id: '{{ $class_id }}'
               },
               type:"POST"
             },
@@ -216,6 +218,10 @@
               {
                 data: 'name',
                 name: 'name'
+              },
+              {
+                data: 'class_name',
+                name: 'class_name'
               },
               {
                 data: 'tehsil_name',

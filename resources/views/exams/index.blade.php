@@ -36,9 +36,6 @@
               	<div class="col-lg-12">
                 	<h3 class="card-title custom-card-title">{{ $card_title }}</h3>
               	</div>
-              	<!-- <div class="col-lg-6">
-              		<a href="{{ url('admin/students/create') }}" class="btn btn-info custom-pull-right"><span class="fa fa-plus-square"></span>&nbsp;&nbsp;New</a>
-              	</div> -->
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -210,7 +207,16 @@
             processing:true,
             serverSide:true,
             ajax:{
-              url: "{{ route('exams.index') }}",
+              headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  data: {
+                    session_id:"{{ $session_id }}",
+                    class_id:"{{ $class_id }}",
+                    center_id:"{{ $center_id }}"
+                  },
+                url: "{{ route('exams.index') }}",
+                type:"GET"
             },
             columns:[
               {

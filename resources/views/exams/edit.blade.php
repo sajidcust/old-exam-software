@@ -51,6 +51,9 @@
                 	{{ csrf_field() }}
                 	<input type="hidden" name="student_id" value="{{ $student->id }}">
                 	<input type="hidden" name="semester_id" value="{{ $semester->id }}">
+                	<input type="hidden" name="session_id" value="{{ $session_id }}">
+                	<input type="hidden" name="class_id" value="{{ $class_id }}">
+                	<input type="hidden" name="center_id" value="{{ $center_id }}">
 	              <div class="card-body">
 	              	<div class="row">
 		              	<div class="col-lg-3">

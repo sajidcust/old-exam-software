@@ -558,7 +558,7 @@
                   <li class="nav-item">
                     <a href="{{ url('admin/students/index') }}" class="nav-link {{ $selected_sub_menu == 'students_index' ? 'active open':'' }}">
                       <i class="far fa-eye nav-icon"></i>
-                      <p>View</p>
+                      <p>View All</p>
                     </a>
                   </li>
                   <li class="nav-item">
@@ -586,7 +586,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{{ url('admin/exams/index') }}" class="nav-link {{ $selected_sub_menu == 'exams_index' ? 'active open':'' }}">
+                    <a href="{{ url('admin/exams/editmarksbysearch') }}" class="nav-link {{ $selected_sub_menu == 'exams_index' ? 'active open':'' }}">
                       <i class="far fa-edit nav-icon"></i>
                       <p>Edit Marks</p>
                     </a>
@@ -616,7 +616,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="{{ url('admin/exams/generatemarksheets') }}" class="nav-link {{ $selected_sub_menu == 'exams_marksheets' ? 'active open':'' }}">
+                    <a href="{{ url('admin/exams/generatemarksheetsbysearch') }}" class="nav-link {{ $selected_sub_menu == 'exams_marksheets' ? 'active open':'' }}">
                       <i class="far fa-address-card nav-icon"></i>
                       <p>Generate Marksheets</p>
                     </a>
@@ -662,9 +662,9 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{{ url('dataentry/students/index') }}" class="nav-link {{ $selected_sub_menu == 'students_index' ? 'active open':'' }}">
+                    <a href="{{ url('dataentry/students/searchbycenter') }}" class="nav-link {{ $selected_sub_menu == 'students_index' ? 'active open':'' }}">
                       <i class="far fa-eye nav-icon"></i>
-                      <p>View</p>
+                      <p>Search</p>
                     </a>
                   </li>
                   <li class="nav-item">

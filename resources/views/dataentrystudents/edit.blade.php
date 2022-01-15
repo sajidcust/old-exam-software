@@ -463,10 +463,6 @@
         gender: {
           required: true
         },
-        home_address: {
-          required: true,
-          minlength: 5
-        },
         cell_no: {
           minlength: 12,
           maxlength: 12

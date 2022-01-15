@@ -82,6 +82,18 @@ class SettingsController extends Controller
 
                 $setting->deputy_controller_name = $request->input('deputy_controller_name');
 
+                if($request->file('deputy_controller_signature')!='') {
+                    $originalImage4= $request->file('deputy_controller_signature');
+                    $thumbnailImage4 = Image::make($originalImage4);
+
+                    $web_path_orig4 = '/images/'.time().'-orig-deputy-controller-signature.'.$originalImage4->getClientOriginalExtension();
+
+                    $orig_add3 = public_path().$web_path_orig4;
+                    $thumbnailImage4->save($orig_add3);
+
+                    $setting->deputy_controller_signature=$web_path_orig4;
+                }
+
                 $setting->save();
 
                 return Redirect::to('admin/index')

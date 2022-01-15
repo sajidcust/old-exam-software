@@ -41,10 +41,14 @@ class ExamsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->selected_sub_menu = "exams_index";
         $this->card_title = "View and Manage all students subject marks.";
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
@@ -69,14 +73,18 @@ class ExamsController extends Controller
                             i.name as center_name,
                             s.class_id,
                             stds.name AS s_class,
-                            ss.id AS session_id
+                            ss.id AS session_id,
+                            s.center_id
                         FROM students AS s
                         JOIN sessions AS ss
                         ON ss.id = s.session_id
                         JOIN institutions AS i
                         ON i.id = s.center_id
                         JOIN standards as stds
-                        ON s.class_id = stds.id;
+                        ON s.class_id = stds.id
+                        WHERE s.session_id = ".$session_id."
+                        AND s.class_id = ".$class_id."
+                        AND s.center_id = ". $center_id .";
                         ")))
                     ->addColumn('subs', function($data){
                         $result = "";
@@ -127,7 +135,7 @@ class ExamsController extends Controller
                         $button = "";
 
                         foreach($semesters as $semester){
-                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/exams/edit/'.$data->id).'/'. $semester->id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm">Update '. $semester->title .' Marks</a>';
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/exams/edit/'.$data->id.'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id).'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm">Update '. $semester->title .' Marks</a>';
                         }
 
                         return $button;
@@ -136,6 +144,29 @@ class ExamsController extends Controller
                     ->make(true);
         }
         return view('exams.index')
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function editmarksbysearch() {
+        $this->selected_sub_menu = "exams_index";
+        $this->card_title = "View and Manage all students subject marks.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('exams.editmarksbysearch')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -647,9 +678,11 @@ class ExamsController extends Controller
         $this->card_title = "View and print award sheets.";
 
         $sessions = Session::all();
+        $standards = Standard::all();
 
         return view('exams.generateawardsheetbydata')
             ->with('sessions', $sessions)
+            ->with('standards', $standards)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -1452,7 +1485,8 @@ class ExamsController extends Controller
         $this->card_title = "View and print award sheets.";
 
         $session_id = $request->input('session_id');
-        $semester_id = $request->input('session_id');
+        $semester_id = $request->input('semester_id');
+        $class_id = $request->input('class_id');
 
         if(request()->ajax())
         {
@@ -1466,8 +1500,12 @@ class ExamsController extends Controller
                     ON t.id = i.tehsil_id
                     WHERE i.is_center = 1;
                     ")))
-                    ->addColumn('action', function($data) use ($session_id, $semester_id){
-                        $button = '<a style="margin-bottom:5px;" href="'.url('admin/exams/downloadawardsheet/'.$data->id.'/'.$session_id.'/'.$semester_id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Generate Award Sheet</a>';
+                    ->addColumn('class_name', function() use ($class_id){
+                        $standard = Standard::find($class_id);
+                        return $standard->name;
+                    })
+                    ->addColumn('action', function($data) use ($session_id, $semester_id, $class_id){
+                        $button = '<a style="margin-bottom:5px;" href="'.url('admin/exams/downloadawardsheet/'.$data->id.'/'.$session_id.'/'.$semester_id.'/'.$class_id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span>&nbsp;&nbsp;Generate Award Sheet</a>';
 
                         return $button;
                     })
@@ -1478,6 +1516,7 @@ class ExamsController extends Controller
         return view('exams.generateawardsheet')
             ->with('session_id', $session_id)
             ->with('semester_id', $semester_id)
+            ->with('class_id', $class_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -1486,13 +1525,15 @@ class ExamsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
-    public function downloadawardsheet($id, $session_id, $semester_id){
+    public function downloadawardsheet($id, $session_id, $semester_id, $class_id){
         $this->selected_sub_menu = "exams_awardsheets";
         $this->card_title = "Download award sheet";
 
         $center = Institution::join('tehsils', 'tehsils.id', '=', 'institutions.tehsil_id')->where('is_center', 1)->where('institutions.id', $id)->first(['institutions.id', 'institutions.name', DB::raw('tehsils.name as tehsil_name')]);
 
-        $standards = Standard::join('students', 'students.class_id', '=', 'standards.id')->join('institutions', 'institutions.id', '=', 'students.center_id')->where('students.center_id', $center->id)->where('students.session_id', $session_id)->groupBy('standards.id')->get(['standards.id', 'standards.name']);
+        //$standards = Standard::join('students', 'students.class_id', '=', 'standards.id')->join('institutions', 'institutions.id', '=', 'students.center_id')->where('students.center_id', $center->id)->where('students.session_id', $session_id)->groupBy('standards.id')->get(['standards.id', 'standards.name']);
+
+        $standard = Standard::find($class_id);
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $paper_date = "DATE_FORMAT(datesheets.paper_date, '%d-%m-%Y') AS paper_date";
@@ -1502,17 +1543,18 @@ class ExamsController extends Controller
             $paper_date = "strftime('%d-%m-%Y', datesheets.paper_date) AS paper_date";
         }
 
-        $subjects = Subject::join('students_subjects', 'students_subjects.subject_id', '=', 'subjects.id')->join('students', 'students.id', 'students_subjects.student_id')->join('datesheets', 'datesheets.subject_id', '=', 'subjects.id')->where('students.center_id', $center->id)->where('datesheets.semester_id', $semester_id)->where('students.session_id', $session_id)->groupBy('subjects.id')->get(['subjects.id', 'subjects.name', DB::raw($paper_date)]);
+        $subjects = Subject::join('students_subjects', 'students_subjects.subject_id', '=', 'subjects.id')->join('students', 'students.id', 'students_subjects.student_id')->join('datesheets', 'datesheets.subject_id', '=', 'subjects.id')->where('students.center_id', $center->id)->where('datesheets.semester_id', $semester_id)->where('students.session_id', $session_id)->where('students.class_id', $class_id)->groupBy('subjects.id')->get(['subjects.id', 'subjects.name', DB::raw($paper_date)]);
 
         $session = Session::find($session_id);
         $semester = Semester::find($semester_id);
 
         $data = [
             'center'     => $center,
-            'standards'  => $standards,
+            'standard'   => $standard,
             'subjects'   => $subjects,
             'session'    => $session,
-            'semester'   => $semester
+            'semester'   => $semester,
+            'setting'    => Setting::find(1)
         ];
 
         $pdf = PDF::loadView('exams.downloadawardsheet', $data);
@@ -1520,9 +1562,33 @@ class ExamsController extends Controller
         return $pdf->download('awardsheet-'.$session_id.'-'.$session->title.'-'.$semester_id.'-'.$semester->title.'-'.$center->id.'-'.$center->name.'-'.$center->tehsil_name.'.pdf');
     }
 
-    public function generatemarksheets() {
+    public function generatemarksheetsbysearch(){
         $this->selected_sub_menu = "exams_marksheets";
         $this->card_title = "View and print mark sheets.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('exams.generatemarksheetsbysearch')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function generatemarksheets(Request $request) {
+        $this->selected_sub_menu = "exams_marksheets";
+        $this->card_title = "View and print mark sheets.";
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
@@ -1564,7 +1630,11 @@ class ExamsController extends Controller
                         JOIN standards as stds
                         ON stds.id = s.class_id
                         JOIN institutions AS i
-                        ON i.id = s.center_id;")))
+                        ON i.id = s.center_id
+                        WHERE s.session_id = ".$session_id."
+                        AND s.class_id = ".$class_id."
+                        AND s.center_id = ".$center_id."
+                        ;")))
                     ->addColumn('image', function($data){
                         return "<img src='".url($data->image)."' style='height:auto;width:100px;'>";
                     })
@@ -1590,12 +1660,81 @@ class ExamsController extends Controller
 
         return view('exams.generatemarksheets')
             ->with('sessions', $sessions)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
             ->with('card_title', $this->card_title)
             ->with('selected_sub_menu', $this->selected_sub_menu)
             ->with('page_title', $this->page_title);
+    }
+
+    public function downloadalldetailedmarksheets(Request $request) {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
+        if(DB::connection()->getDriverName() == 'mysql') {
+            $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
+            $registration_no = "CONCAT(ss.id, '-', stds.id, '-', s.id) AS registration_no,";
+        }
+
+        if(DB::connection()->getDriverName() == 'sqlite') {
+            $date_of_birth = "strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,";
+            $registration_no = "(ss.id || '-' || stds.id || '-' || s.id) AS registration_no,";
+        }
+
+        $students = DB::select(DB::raw("
+                        SELECT
+                            s.id,
+                            s.name,
+                            s.father_name,
+                            s.image,
+                            s.gender,
+                            s.student_type as status,
+                            ".$date_of_birth."
+                            s.dob_in_words,
+                            ss.title as session_title,
+                            (
+                                SELECT institutions.name FROM institutions
+                                WHERE s.institution_id = institutions.id
+                            ) AS institution_name,
+                            i.id as center_id,
+                            s.class_id,
+                            ss.year,
+                            i.name as center_name,
+                            stds.name as class_name,
+                            d.name as district_name,
+                            ".$registration_no."
+                            s.session_id,
+                            s.created_at,
+                            s.updated_at
+                        FROM students AS s
+                        JOIN sessions AS ss
+                        ON ss.id = s.session_id
+                        JOIN standards as stds
+                        ON stds.id = s.class_id
+                        JOIN institutions AS i
+                        ON i.id = s.center_id
+                        JOIN tehsils as t
+                        ON t.id = i.tehsil_id
+                        JOIN districts as d
+                        ON d.id = t.district_id
+                        WHERE s.session_id = ".$session_id."
+                        AND s.class_id = ". $class_id ."
+                        AND s.center_id = ". $center_id .";
+                    "));
+
+        $data = [
+            'students'     => $students,
+            'setting'     => Setting::find(1)
+        ];
+
+        $pdf = PDF::loadView('exams.downloaddetailedmarksheetall', $data);
+
+        return $pdf->download('detailed_marksheet-'.$session_id.'-'.$class_id.'-'.$center_id.'.pdf');
     }
 
     public function downloaddetailedmarksheet($id){
@@ -1668,7 +1807,7 @@ class ExamsController extends Controller
 
         $pdf = PDF::loadView('exams.downloaddetailedmarksheet', $data);
 
-        return $pdf->download('getailed_marksheet-'.$student->id.'-'.$student->name.'-'.$student->father_name.'.pdf');
+        return $pdf->download('detailed_marksheet-'.$student->id.'-'.$student->name.'-'.$student->father_name.'.pdf');
     }
 
     public function downloadmarksheet($id) {
@@ -1686,7 +1825,7 @@ class ExamsController extends Controller
         $count = StudentsExam::where('student_id', $id)->count();
 
         if($count == 0) {
-            return Redirect::to('admin/exams/generatemarksheets')
+            return Redirect::to('admin/exams/generatemarksheetsbysearch')
                 ->with('message', 'There are no any marks entered for any of the semesters for the selected student.');
         }
 
@@ -1741,9 +1880,81 @@ class ExamsController extends Controller
         return $pdf->download('marksheet-'.$student->id.'-'.$student->name.'-'.$student->father_name.'.pdf');
     }
 
-    public function generateslips(){
+    public function downloadallmarksheets(Request $request) {
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
+        if(DB::connection()->getDriverName() == 'mysql') {
+            $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
+            $registration_no = "CONCAT(ss.id, '-', stds.id, '-', s.id) AS registration_no,";
+        }
+
+        if(DB::connection()->getDriverName() == 'sqlite') {
+            $date_of_birth = "strftime('%d-%m-%Y', s.date_of_birth) AS date_of_birth,";
+            $registration_no = "(ss.id || '-' || stds.id || '-' || s.id) AS registration_no,";
+        }
+
+        $students = DB::select(DB::raw("
+                        SELECT
+                            s.id,
+                            s.name,
+                            s.father_name,
+                            s.image,
+                            s.gender,
+                            s.student_type as status,
+                            ".$date_of_birth."
+                            s.dob_in_words,
+                            ss.title as session_title,
+                            (
+                                SELECT institutions.name FROM institutions
+                                WHERE s.institution_id = institutions.id
+                            ) AS institution_name,
+                            i.id as center_id,
+                            s.class_id,
+                            ss.year,
+                            i.name as center_name,
+                            stds.name as class_name,
+                            d.name as district_name,
+                            ".$registration_no."
+                            s.session_id,
+                            s.created_at,
+                            s.updated_at
+                        FROM students AS s
+                        JOIN sessions AS ss
+                        ON ss.id = s.session_id
+                        JOIN standards as stds
+                        ON stds.id = s.class_id
+                        JOIN institutions AS i
+                        ON i.id = s.center_id
+                        JOIN tehsils as t
+                        ON t.id = i.tehsil_id
+                        JOIN districts as d
+                        ON d.id = t.district_id
+                        WHERE s.session_id = ".$session_id."
+                        AND s.class_id = ".$class_id."
+                        AND s.center_id = ".$center_id.";
+                    "));
+
+        $data = [
+            'students'     => $students,
+            'setting'     => Setting::find(1)
+        ];
+
+        $pdf = PDF::loadView('exams.downloadmarksheetinbulk', $data);
+
+        return $pdf->download('marksheet-'.$session_id.'-'.$class_id.'-'.$center_id.'.pdf');
+    }
+
+    public function generateslipsbysearch(Request $request){
         $this->selected_sub_menu = "exams_slips";
         $this->card_title = "View and print slips.";
+
+        $session_id = $request->input('session_id');
+        $semester_id = $request->input('semester_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
@@ -1756,7 +1967,9 @@ class ExamsController extends Controller
 
         if(request()->ajax())
         {
-            return datatables()->of(DB::select(DB::raw("
+            return datatables()->of(
+                DB::select(
+                    DB::raw("
                         SELECT
                             s.id,
                             s.name,
@@ -1785,7 +1998,14 @@ class ExamsController extends Controller
                         JOIN standards as stds
                         ON stds.id = s.class_id
                         JOIN institutions AS i
-                        ON i.id = s.center_id;")))
+                        ON i.id = s.center_id
+                        JOIN semesters sem
+                        ON sem.session_id = ss.id
+                        WHERE s.session_id = ". $session_id ." 
+                        AND s.class_id = ". $class_id ." 
+                        AND s.center_id = ". $center_id ."
+                        AND sem.id = ". $semester_id ." 
+                        ;")))
                     ->addColumn('image', function($data){
                         return "<img src='".url($data->image)."' style='height:auto;width:100px;'>";
                     })
@@ -1810,12 +2030,105 @@ class ExamsController extends Controller
 
         return view('exams.generateslips')
             ->with('sessions', $sessions)
+            ->with('session_id', $session_id)
+            ->with('semester_id', $semester_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
             ->with('card_title', $this->card_title)
             ->with('selected_sub_menu', $this->selected_sub_menu)
             ->with('page_title', $this->page_title);
+    }
+
+    public function generateslips(){
+        $this->selected_sub_menu = "exams_slips";
+        $this->card_title = "View and print slips.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('exams.generateslipsbysearch')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function downloadall(Request $request){
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+        $semester_id = $request->input('semester_id');
+
+        if(DB::connection()->getDriverName() == 'mysql') {
+            $registration_no = "CONCAT(ss.id, '-', stds.id, '-', s.id) AS registration_no,";
+        }
+
+        if(DB::connection()->getDriverName() == 'sqlite') {
+            $registration_no = "(ss.id || '-' || stds.id || '-' || s.id) AS registration_no,";
+        }
+
+        if($session_id){
+            $students = DB::select(DB::raw("
+                        SELECT
+                            s.id,
+                            s.name,
+                            s.father_name,
+                            s.image,
+                            ss.title as session_title,
+                            (
+                                SELECT institutions.name FROM institutions
+                                WHERE s.institution_id = institutions.id
+                            ) AS institution_name,
+                            i.id as center_id,
+                            i.name as center_name,
+                            stds.name as class_name,
+                            d.name as district_name,
+                            ".$registration_no."
+                            s.session_id,
+                            s.created_at,
+                            s.updated_at
+                        FROM students AS s
+                        JOIN sessions AS ss
+                        ON ss.id = s.session_id
+                        JOIN standards as stds
+                        ON stds.id = s.class_id
+                        JOIN institutions AS i
+                        ON i.id = s.center_id
+                        JOIN tehsils as t
+                        ON t.id = i.tehsil_id
+                        JOIN districts as d
+                        ON d.id = t.district_id
+                        JOIN semesters as sem
+                        ON sem.session_id = ss.id
+                        WHERE s.session_id = ".$session_id."
+                        AND sem.id = ". $semester_id ."
+                        AND s.class_id = ". $class_id ."
+                        AND s.center_id = ". $center_id ."
+                        ;"));
+
+        $semester = Semester::find($semester_id);
+        $session = Session::find($session_id);
+
+        $data = [
+            'students'     => $students,
+            'session_id'   => $session_id,
+            'semester_id'  => $semester_id,
+            'setting'      => Setting::find(1)
+        ];
+
+        $pdf = PDF::loadView('exams.downloadinbulk', $data);
+
+        return $pdf->download('roll-no-slip-'.$session_id.'-'.$semester_id.'-'.$class_id.'-'.$center_id.'.pdf');
+        }
     }
 
 
@@ -1931,7 +2244,7 @@ class ExamsController extends Controller
      * @param  \App\Models\Province  $province
      * @return \Illuminate\Http\Response
      */
-    public function edit($id, $semester_id)
+    public function edit($id, $semester_id, $session_id, $class_id, $center_id)
     {
         $this->selected_sub_menu = "exams_index";
         $this->card_title = "Please fill in the form to update the marks";
@@ -1945,6 +2258,9 @@ class ExamsController extends Controller
             ->with('student', $student)
             ->with('semester', $semester)
             ->with('subjects', $subjects)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -1964,6 +2280,11 @@ class ExamsController extends Controller
     {
         $subject_ids = $request->input('subject_id');
         $semester_id = $request->input('semester_id');
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
+
         $counter = count($subject_ids);     
 
         if($semester_id){
@@ -2014,18 +2335,16 @@ class ExamsController extends Controller
                         $studentexam->save();
 
                     }  else {
-                        return Redirect::to('admin/exams/edit/'.$request->input('student_id').'/'.$request->input('semester_id'))
-                            ->withErrors($validator)
-                            ->withInput($request->all());      
+                        return Redirect::to('admin/exams/edit/'.$request->input('student_id').'/'.$request->input('semester_id').'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                                ->withErrors($validator)
+                                ->withInput($request->all());      
                     }
                 }
-
-                return Redirect::to('admin/exams/index')
-                        ->with('message', 'Exam record updated successfully.');
+                return redirect()->route('exams.index', ['session_id' => $session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Exam record updated successfully.');
             }
             
         } else {
-            return Redirect::to('admin/exams/index')
+            return Redirect::to('admin/exams/editmarksbysearch')
                             ->with('message', 'Something Went Wrong! Please try again later.');
         }
     }

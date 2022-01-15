@@ -190,8 +190,43 @@ class StudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
+    public function updatefeebysearch($id, $semester_id, $session_id, $class_id, $center_id)
+    {
+        $this->selected_sub_menu = "students_create";
+        $this->card_title = "Please fill in the form below to update fee details";
+
+        $students_fees = StudentsFee::where('student_id', $id)->where('semester_id', $semester_id)->first();
+
+
+        $fees = Fee::all();
+        $banks = Bank::all();
+        $semester = Semester::find($semester_id);
+        $student = Student::find($id);
+
+        return view('students.updatefee')
+            ->with('fees', $fees)
+            ->with('banks', $banks)
+            ->with('semester', $semester)
+            ->with('student', $student)
+            ->with('studentsfee', $students_fees)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
 
     public function storefee(Request $request){
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $validator = Validator::make($request->all(), StudentsFee::$rules);
         if ($validator->passes()) {
 
@@ -219,12 +254,22 @@ class StudentsController extends Controller
                 $students_fees_selection->save();
             }
 
-            return Redirect::to('admin/students/search')
-                ->with('message', 'Fee Details Updated Successfully.');
+            if($session_id && $class_id && $center_id) {
+                return redirect()->route('students.searchstudent', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Fee Details Updated Successfully.');
+            } else {
+                return Redirect::to('admin/students/search')
+                    ->with('message', 'Fee Details Updated Successfully.');
+            }
         } else {
-            return Redirect::to('admin/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id'))
-                ->withErrors($validator)
-                ->withInput($request->all());      
+            if($session_id && $class_id && $center_id){
+                return Redirect::to('admin/students/updatefeebysearch/'.$request->input('student_id').'/'.$request->input('semester_id').'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                    ->withErrors($validator)
+                    ->withInput($request->all());      
+            } else {
+                return Redirect::to('admin/students/updatefee/'.$request->input('student_id').'/'.$request->input('semester_id'))
+                    ->withErrors($validator)
+                    ->withInput($request->all()); 
+            }
         }
     }
 
@@ -380,11 +425,7 @@ class StudentsController extends Controller
             }
 
             if($session_id && $class_id && $center_id) {
-                return Redirect::to('admin/students/searchstudent')
-                    ->with('session_id', $session_id)
-                    ->with('class_id', $class_id)
-                    ->with('center_id', $center_id)
-                    ->with('message', 'New student created successfully.');
+                return redirect()->route('students.searchstudent', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'New student created successfully.');
             } else {
                 return Redirect::to('admin/students/index')
                     ->with('message', 'New student created successfully.');
@@ -558,7 +599,7 @@ class StudentsController extends Controller
                 }
 
                 if($session_id && $class_id && $center_id) {
-                    return redirect()->route('students.searchstudent', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id]);
+                    return redirect()->route('students.searchstudent', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Student updated successfully.');
                 } else {
                     return Redirect::to('admin/students/index')
                         ->with('message', 'Student updated successfully.');
@@ -592,7 +633,7 @@ class StudentsController extends Controller
                 return response()->json(['success'=>'true', 'message'=>'Success! Your request has been completed successfully.']);
 
             } catch (\Illuminate\Database\QueryException $e) {
-                //var_dump($e->errorInfo);
+                
                 if($e->getCode()==23000) {
                     return response()->json(['success'=>'false', 'message'=>'<b>Integrity Constraint Violation!</b><br>You must delete child records first then you should delete this item to ensure referential integrity.']);
                 } else {
@@ -641,12 +682,12 @@ class StudentsController extends Controller
 
     public function searchstudent(Request $request)
     {
+        $this->selected_sub_menu = "search_students";
+        $this->card_title = "View and Manage all students shown below.";
+
         $session_id = $request->input('session_id');
         $class_id = $request->input('class_id');
         $center_id = $request->input('center_id');
-
-        $this->selected_sub_menu = "search_students";
-        $this->card_title = "View and Manage all students shown below.";
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $date_of_birth = "DATE_FORMAT(s.date_of_birth, '%d-%m-%Y') AS date_of_birth,";
@@ -762,7 +803,7 @@ class StudentsController extends Controller
                         $semesters = Semester::where('session_id', $data->session_id)->get();
 
                         foreach($semesters as $semester){
-                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/students/updatefee/'.$data->id).'/'. $semester->id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/students/updatefeebysearch/'.$data->id).'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
                         }
 
                         return $button;

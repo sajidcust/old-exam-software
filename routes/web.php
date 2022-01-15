@@ -92,6 +92,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/students/update', [StudentsController::class, 'update'])->name('students.update');
 	Route::get('/students/getFeeData', [StudentsController::class, 'getFeeData'])->name('students.getFeeData');
 	Route::get('/students/updatefee/{id}/{semester_id}', [StudentsController::class, 'updatefee']);
+	Route::get('/students/updatefeebysearch/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [StudentsController::class, 'updatefeebysearch']);
 	Route::post('/students/storefee', [StudentsController::class, 'storefee'])->name('students.storefee');
 	Route::post('/students/getsubjectsgroupdata', [StudentsController::class, 'getsubjectsgroupdata'])->name('students.getsubjectsgroupdata');
 
@@ -170,11 +171,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 
 	Route::get('/exams', [ExamsController::class, 'index']);
 	Route::get('/exams/index', [ExamsController::class, 'index'])->name('exams.index');
-	Route::get('/exams/edit/{id}/{semester_id}', [ExamsController::class, 'edit']);
+	Route::get('/exams/editmarksbysearch', [ExamsController::class, 'editmarksbysearch'])->name('exams.editmarksbysearch');
+	Route::get('/exams/edit/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [ExamsController::class, 'edit']);
 	Route::post('/exams/update', [ExamsController::class, 'update'])->name('exams.update');
 	Route::get('/exams/generateslips', [ExamsController::class, 'generateslips'])->name('exams.generateslips');
+	Route::get('/exams/generateslipsbysearch', [ExamsController::class, 'generateslipsbysearch'])->name('exams.generateslipsbysearch');
 	Route::get('/exams/downloadslip/{id}', [ExamsController::class, 'downloadslip']);
 	Route::post('/exams/generateinbulk', [ExamsController::class, 'generateinbulk'])->name('exams.generateinbulk');
+	Route::post('/exams/downloadall', [ExamsController::class, 'downloadall'])->name('exams.downloadall');
 	Route::post('/exams/generateslipbysessionid', [ExamsController::class, 'generateslipbysessionid'])->name('exams.generateslipbysessionid');
 	Route::post('/exams/generateslipbydistrictid', [ExamsController::class, 'generateslipbydistrictid'])->name('exams.generateslipbydistrictid');
 	Route::post('/exams/generateslipbyinstitutionid', [ExamsController::class, 'generateslipbyinstitutionid'])->name('exams.generateslipbyinstitutionid');
@@ -184,7 +188,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/exams/generateslipbystudenttype', [ExamsController::class, 'generateslipbystudenttype'])->name('exams.generateslipbystudenttype');
 	Route::get('/exams/generateawardsheetbydata', [ExamsController::class, 'generateawardsheetbydata'])->name('exams.generateawardsheetbydata');
 	Route::post('/exams/generateawardsheet', [ExamsController::class, 'generateawardsheet'])->name('exams.generateawardsheet');
-	Route::get('/exams/downloadawardsheet/{id}/{session_id}/{semester_id}', [ExamsController::class, 'downloadawardsheet']);
+	Route::get('/exams/downloadawardsheet/{id}/{session_id}/{semester_id}/{class_id}', [ExamsController::class, 'downloadawardsheet']);
 	Route::get('/exams/generategazette', [ExamsController::class, 'generategazette'])->name('exams.generategazette');
 	Route::post('/exams/downloadgazettebyss', [ExamsController::class, 'downloadgazettebyss'])->name('exams.downloadgazettebyss');
 	Route::post('/exams/downloadgazettecombined', [ExamsController::class, 'downloadgazettecombined'])->name('exams.downloadgazettecombined');
@@ -216,6 +220,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/failedjobs/destroyall', [FailedJobsController::class, 'destroyall'])->name('failedjobs.destroyall');
 
 	Route::get('/exams/generatemarksheets', [ExamsController::class, 'generatemarksheets'])->name('exams.generatemarksheets');
+	Route::get('/exams/generatemarksheetsbysearch', [ExamsController::class, 'generatemarksheetsbysearch'])->name('exams.generatemarksheetsbysearch');
+	Route::post('/exams/downloadallmarksheets', [ExamsController::class, 'downloadallmarksheets'])->name('exams.downloadallmarksheets');
+	Route::post('/exams/downloadalldetailedmarksheets', [ExamsController::class, 'downloadalldetailedmarksheets'])->name('exams.downloadalldetailedmarksheets');
 	Route::get('/exams/downloadmarksheet/{id}', [ExamsController::class, 'downloadmarksheet']);
 	Route::get('/exams/downloaddetailedmarksheet/{id}', [ExamsController::class, 'downloaddetailedmarksheet']);
 	Route::get('/exams/updatemarksbycenters', [ExamsController::class, 'updatemarksbycenters'])->name('exams.updatemarksbycenters');
@@ -238,16 +245,18 @@ Route::group(['prefix' => 'dataentry', 'middleware' => 'isdataentry'], function 
 	Route::get('/', [DataEntryController::class, 'index']);
 	Route::get('/dashboard', [DataEntryController::class, 'index']);
 
-	Route::get('/students', [DataEntryStudentsController::class, 'index']);
-	Route::get('/students/index', [DataEntryStudentsController::class, 'index'])->name('destudents.index');
+	Route::get('/students/searchbycenter', [DataEntryStudentsController::class, 'searchbycenter']);
+	Route::get('/students/searchedstudents', [DataEntryStudentsController::class, 'searchedstudents'])->name('destudents.searchedstudents');
+	Route::get('/students/createsearched/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'create'])->name('destudents.createsearched');
 	Route::get('/students/create', [DataEntryStudentsController::class, 'create'])->name('destudents.create');
 	Route::post('/students/store', [DataEntryStudentsController::class, 'store'])->name('destudents.store');
 	Route::post('/students/destroy', [DataEntryStudentsController::class, 'destroy'])->name('destudents.destroy');
-	Route::get('/students/edit/{id}', [DataEntryStudentsController::class, 'edit']);
+	Route::get('/students/edit/{id}/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'edit']);
 	Route::post('/students/update', [DataEntryStudentsController::class, 'update'])->name('destudents.update');
 	Route::get('/students/getFeeData', [DataEntryStudentsController::class, 'getFeeData'])->name('destudents.getFeeData');
 	Route::get('/students/updatefee/{id}/{semester_id}', [DataEntryStudentsController::class, 'updatefee']);
 	Route::get('/students/updatefeestep/{id}/{semester_id}', [DataEntryStudentsController::class, 'updatefeestep']);
+	Route::get('/students/updatefeestepsearched/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'updatefeestepsearched']);
 	Route::post('/students/storefee', [DataEntryStudentsController::class, 'storefee'])->name('destudents.storefee');
 	Route::post('/students/getsubjectsgroupdata', [DataEntryStudentsController::class, 'getsubjectsgroupdata'])->name('destudents.getsubjectsgroupdata');
 });

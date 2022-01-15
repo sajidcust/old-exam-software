@@ -60,7 +60,7 @@
         <td width="20" style="padding-left:20px" rowspan="3">
         @if($student->image != '')
           <?php $image = ltrim($student->image, $student->image[0]); ?>
-          <img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="75"/>
+          <img style="border:2px solid #ccc;" src="{{ $image }}" alt="" width="70"/>
         @endif
         </td>
       </tr>
@@ -136,14 +136,27 @@
   </table>
 
 
-  <table width="100%">
+  <table style="margin-top:5px;" width="100%">
     <tbody>
       <tr>
         <td>
-          <img src="img/slip_note.jpg" alt="" width="60%"/>
+          <img src="img/slip_note.jpg" alt="" width="55%"/>
         </td>
+        <td style="text-align: center;">
+          @if($setting->deputy_controller_signature != '')
+            <?php $dcsi = ltrim($setting->deputy_controller_signature, $setting->deputy_controller_signature[0]); ?>
+            <img src="{{ $dcsi }}" alt="" width="60"/>
+          @else
+            <img src="img/controller_signature.jpg" alt="" width="60"/>
+          @endif
+        </td>
+      </tr>
+      <tr>
         <td>
-          <img src="img/controller_signature.jpg" alt="" width="20%"/>
+          &nbsp;
+        </td>
+        <td style="text-align: center;">
+          <h5 style="margin:0px;padding:0px;">Deputy Controller</h5>
         </td>
       </tr>
     </tbody>
