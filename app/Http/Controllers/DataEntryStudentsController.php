@@ -663,7 +663,7 @@ class DataEntryStudentsController extends Controller
 
                 $semester = Semester::where('session_id', $student->session_id)->orderBy('id', 'ASC')->first();
 
-                return Redirect::to('dataentry/students/updatefeestep/'.$student->id.'/'.$semester->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
+                return Redirect::to('dataentry/students/updatefeestepsearched/'.$student->id.'/'.$semester->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
                     ->with('message', 'Student updated successfully. Please update the fee details to continue.');
             } else {
                 return Redirect::to('dataentry/students/edit/'.$student->id.'/'.$session_id.'/'.$class_id.'/'.$center_id)
