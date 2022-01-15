@@ -26,8 +26,32 @@ class MarksController extends Controller
     protected $card_title;
     protected $selected_sub_menu;
 
-    public function index()
+    public function editmarksbysearch(){
+        $this->selected_sub_menu = "marks_index";
+        $this->card_title = "View and Manage all students subject marks.";
+
+        $sessions = Session::all();
+        $standards = Standard::all();
+        $centers = Institution::where('is_center', 1)->get();
+
+        return view('assessmentcenters.editmarksbysearch')
+            ->with('sessions', $sessions)
+            ->with('standards', $standards)
+            ->with('centers', $centers)
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function index(Request $request)
     {
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+
         $this->selected_sub_menu = "marks_index";
         $this->card_title = "View and Manage all students subject marks.";
 
@@ -54,15 +78,19 @@ class MarksController extends Controller
                             i.name as center_name,
                             s.class_id,
                             stds.name AS s_class,
-                            ss.id AS session_id
+                            ss.id AS session_id,
+                            s.center_id
                         FROM students AS s
                         JOIN sessions AS ss
                         ON ss.id = s.session_id
                         JOIN institutions AS i
                         ON i.id = s.center_id
                         JOIN standards as stds
-                        ON s.class_id = stds.id;
-                        ")))
+                        ON s.class_id = stds.id
+                        WHERE s.session_id = ". $session_id ."
+                        AND s.class_id = ". $class_id ."
+                        AND s.center_id = ". $center_id ."
+                        ;")))
                     ->addColumn('subs', function($data){
                         $result = "";
                         $subjects = StudentsSubject::join('subjects', 'subjects.id', '=', 'students_subjects.subject_id')->where('students_subjects.student_id', $data->id)->get();
@@ -112,7 +140,7 @@ class MarksController extends Controller
                         $button = "";
 
                         foreach($semesters as $semester){
-                            $button .= '<a style="margin-bottom:5px;" href="'.url('assessmentcenter/marks/edit/'.$data->id).'/'. $semester->id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm">Update '. $semester->title .' Marks</a>';
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('assessmentcenter/marks/edit/'.$data->id).'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm">Update '. $semester->title .' Marks</a>';
                         }
 
                         return $button;
@@ -121,6 +149,9 @@ class MarksController extends Controller
                     ->make(true);
         }
         return view('assessmentcenters.students')
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -129,7 +160,7 @@ class MarksController extends Controller
             ->with('page_title', $this->page_title);
     }
 
-    public function edit($id, $semester_id)
+    public function edit($id, $semester_id, $session_id, $class_id, $center_id)
     {
         $this->selected_sub_menu = "marks_index";
         $this->card_title = "Please fill in the form to update the marks";
@@ -144,6 +175,9 @@ class MarksController extends Controller
             ->with('student', $student)
             ->with('semester', $semester)
             ->with('subjects', $subjects)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -156,7 +190,11 @@ class MarksController extends Controller
     {
         $subject_ids = $request->input('subject_id');
         $semester_id = $request->input('semester_id');
-        $counter = count($subject_ids);     
+        $counter = count($subject_ids);
+
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
 
         if($semester_id){
 
@@ -205,18 +243,16 @@ class MarksController extends Controller
                         $studentexam->save();
 
                     }  else {
-                        return Redirect::to('assessmentcenter/marks/edit/'.$request->input('student_id').'/'.$request->input('semester_id'))
+                        return Redirect::to('assessmentcenter/marks/edit/'.$request->input('student_id').'/'.$request->input('semester_id').'/'.$session_id.'/'.$class_id.'/'.$center_id)
                             ->withErrors($validator)
                             ->withInput($request->all());      
                     }
                 }
-
-                return Redirect::to('assessmentcenter/marks/index')
-                        ->with('message', 'Exam record updated successfully.');
+                return redirect()->route('marks.index', ['session_id' => $session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Exam record updated successfully.');
             }
             
         } else {
-            return Redirect::to('assessmentcenter/marks/index')
+            return Redirect::to('assessmentcenter/marks/editmarksbysearch')
                             ->with('message', 'Something Went Wrong! Please try again later.');
         }
     }

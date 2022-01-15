@@ -210,7 +210,16 @@
             processing:true,
             serverSide:true,
             ajax:{
-              url: "{{ route('marks.index') }}",
+              headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                  },
+                  data: {
+                    session_id:"{{ $session_id }}",
+                    class_id:"{{ $class_id }}",
+                    center_id:"{{ $center_id }}"
+                  },
+                url: "{{ route('marks.index') }}",
+                type:"GET"
             },
             columns:[
               {

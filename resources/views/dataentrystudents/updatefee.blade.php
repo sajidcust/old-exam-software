@@ -44,7 +44,12 @@
               <form id="quickForm" method="post" action="{{ route('destudents.storefee') }}">
               	{{ csrf_field() }}
               	<input type="hidden" name="student_id" value="{{ $student->id }}">
-              	<input type="hidden" name="semester_id" value="{{ $semester->id }}">
+                <input type="hidden" name="semester_id" value="{{ $semester->id }}">
+                @if(isset($session_id))
+                  <input type="hidden" name="session_id" value="{{ $session_id }}">
+                  <input type="hidden" name="class_id" value="{{ $class_id }}">
+                	<input type="hidden" name="center_id" value="{{ $center_id }}">
+                @endif
                 <div class="card-body">
                 	<?php 
                 		$selected_fee = App\Models\StudentsFeesSelection::returnfeeidsarray($student->id, $semester->id);

@@ -180,7 +180,7 @@ class DataEntryStudentsController extends Controller
                         $semesters = Semester::where('session_id', $data->session_id)->get();
 
                         foreach($semesters as $semester){
-                            $button .= '<a style="margin-bottom:5px;" href="'.url('admin/students/updatefeebysearch/'.$data->id).'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
+                            $button .= '<a style="margin-bottom:5px;" href="'.url('dataentry/students/updatefee/'.$data->id).'/'. $semester->id.'/'.$data->session_id.'/'.$data->class_id.'/'.$data->center_id.'" name="edit" id="'.$data->id.'_'.$semester->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-dollar-sign"></span>&nbsp;&nbsp;'. $semester->title .' Fee</a>';
                         }
 
                         return $button;
@@ -200,7 +200,7 @@ class DataEntryStudentsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
-    public function updatefee($id, $semester_id)
+    public function updatefee($id, $semester_id, $session_id, $class_id, $center_id)
     {
         $this->selected_sub_menu = "students_create";
         $this->card_title = "Please fill in the form below to update fee details";
@@ -219,6 +219,9 @@ class DataEntryStudentsController extends Controller
             ->with('semester', $semester)
             ->with('student', $student)
             ->with('studentsfee', $students_fees)
+            ->with('session_id', $session_id)
+            ->with('class_id', $class_id)
+            ->with('center_id', $center_id)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -322,14 +325,14 @@ class DataEntryStudentsController extends Controller
                 if($session_id && $class_id && $center_id){
                     return redirect()->route('destudents.searchedstudents', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Student Details Updated Successfully.');
                 } else {
-                    return Redirect::to('dataentry/students/index')
+                    return Redirect::to('dataentry/index')
                         ->with('message', 'Student Details Updated Successfully.');
                 }
             } else {
                 if($session_id && $class_id && $center_id){
                     return redirect()->route('destudents.searchedstudents', ['session_id'=>$session_id, 'class_id'=>$class_id, 'center_id'=>$center_id])->with('message', 'Fee Details Updated Successfully.');
                 } else {
-                    return Redirect::to('dataentry/students/index')
+                    return Redirect::to('dataentry/index')
                         ->with('message', 'Fee Details Updated Successfully.');
                 }
             }

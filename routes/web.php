@@ -254,7 +254,7 @@ Route::group(['prefix' => 'dataentry', 'middleware' => 'isdataentry'], function 
 	Route::get('/students/edit/{id}/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'edit']);
 	Route::post('/students/update', [DataEntryStudentsController::class, 'update'])->name('destudents.update');
 	Route::get('/students/getFeeData', [DataEntryStudentsController::class, 'getFeeData'])->name('destudents.getFeeData');
-	Route::get('/students/updatefee/{id}/{semester_id}', [DataEntryStudentsController::class, 'updatefee']);
+	Route::get('/students/updatefee/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'updatefee']);
 	Route::get('/students/updatefeestep/{id}/{semester_id}', [DataEntryStudentsController::class, 'updatefeestep']);
 	Route::get('/students/updatefeestepsearched/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [DataEntryStudentsController::class, 'updatefeestepsearched']);
 	Route::post('/students/storefee', [DataEntryStudentsController::class, 'storefee'])->name('destudents.storefee');
@@ -268,7 +268,8 @@ Route::group(['prefix' => 'assessmentcenter', 'middleware' => 'isassessmentcente
 
 	Route::get('/marks', [MarksController::class, 'index']);
 	Route::get('/marks/index', [MarksController::class, 'index'])->name('marks.index');
-	Route::get('/marks/edit/{id}/{semester_id}', [MarksController::class, 'edit']);
+	Route::get('/marks/editmarksbysearch', [MarksController::class, 'editmarksbysearch'])->name('marks.editmarksbysearch');
+	Route::get('/marks/edit/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [MarksController::class, 'edit']);
 	Route::post('/marks/update', [MarksController::class, 'update'])->name('marks.update');
 	Route::get('/marks/updatemarksbycenters', [MarksController::class, 'updatemarksbycenters'])->name('marks.updatemarksbycenters');
 	Route::post('/marks/storemarksbycenters', [MarksController::class, 'storemarksbycenters'])->name('marks.storemarksbycenters');

@@ -689,7 +689,7 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{{ url('assessmentcenter/marks/index') }}" class="nav-link {{ $selected_sub_menu == 'marks_index' ? 'active open':'' }}">
+                    <a href="{{ url('assessmentcenter/marks/editmarksbysearch') }}" class="nav-link {{ $selected_sub_menu == 'marks_index' ? 'active open':'' }}">
                       <i class="far fa-edit nav-icon"></i>
                       <p>Update Marks</p>
                     </a>

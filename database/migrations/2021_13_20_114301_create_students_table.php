@@ -20,7 +20,7 @@ class CreateStudentsTable extends Migration
             $table->date('date_of_birth')->default(date("2000-12-12"));
             $table->string('dob_in_words');
             $table->boolean('gender')->default(0);
-            $table->text('home_address');
+            $table->text('home_address')->nullable();
             $table->string('cell_no')->nullable();
             $table->string('email')->nullable();
             $table->string('image');
