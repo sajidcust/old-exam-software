@@ -57,6 +57,98 @@ class ImportExportsController extends Controller
             ->with('page_title', $this->page_title);
     }
 
+    public function getexporteddata(){
+
+    	Config::set("database.connections.sqlite", [
+            "driver" => "sqlite",
+            "url" => '',
+            "database" => database_path('database.sqlite'),
+            "prefix" => '',
+            'foreign_key_constraints' => ''
+        ]);
+    		
+    	$students = DB::connection('sqlite')->select(DB::raw("
+                        SELECT
+                            s.id,
+                            s.name,
+                            s.father_name,
+                            d.name AS district_name,
+                            ss.title,
+                            (
+                                SELECT institutions.name FROM institutions
+                                WHERE s.institution_id = institutions.id
+                            ) AS institution_name,
+                            i.name as center_name,
+                            stds.name as class_name
+                        FROM students AS s
+                        JOIN sessions AS ss
+                        ON ss.id = s.session_id
+                        JOIN standards as stds
+                        ON stds.id = s.class_id
+                        JOIN institutions AS i
+                        ON i.id = s.center_id
+                        JOIN tehsils AS t
+                        ON t.id = i.tehsil_id
+                        JOIN districts as d
+                        ON d.id = t.district_id
+                        ORDER BY s.id DESC;
+					"));
+        if(request()->ajax())
+        {
+            return datatables()->of($students)
+                    ->addColumn('action', function($data){
+                        $button = '<button type="button" name="delete" id = "dlt_button" class="btn btn-danger margin-2px btn-sm" data-url="'.route('importsexports.destroystudents').'" data-districtid="'.$data->id.'" data-token="'.csrf_token().'"><span class="fa fa-window-close"></span></button>';
+                        return $button;
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+        }
+        return view('importsexports.export')
+            ->with('main_title', $this->main_title)
+            ->with('selected_main_menu', $this->selected_main_menu)
+            ->with('breadcrumb_title', $this->breadcrumb_title)
+            ->with('card_title', $this->card_title)
+            ->with('selected_sub_menu', $this->selected_sub_menu)
+            ->with('page_title', $this->page_title);
+    }
+
+    public function destroystudents(Request $request) {
+    	$student_id = $request->get('id');
+
+    	Config::set("database.connections.sqlite", [
+            "driver" => "sqlite",
+            "url" => '',
+            "database" => database_path('database.sqlite'),
+            "prefix" => '',
+            'foreign_key_constraints' => ''
+        ]);
+
+        if($student_id){
+            try {
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students_subjects WHERE student_id = ".$student_id));
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students_semesters WHERE student_id = ".$student_id));
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students_exams WHERE student_id = ".$student_id));
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students_fees_selections WHERE student_id = ".$student_id));
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students_fees WHERE student_id = ".$student_id));
+            	DB::connection('sqlite')->select(DB::raw("DELETE FROM students WHERE id = ".$student_id));
+
+            	$count_students = DB::connection('sqlite')->select(DB::raw("SELECT COUNT(*) AS total_records FROM students"));
+
+                return response()->json(['success'=>'true', 'message'=>'Success! Your request has been completed successfully.', 'total_students'=>$count_students[0]->total_records]);
+
+            } catch (\Illuminate\Database\QueryException $e) {
+                
+                if($e->getCode()==23000) {
+                    return response()->json(['success'=>'false', 'message'=>'<b>Integrity Constraint Violation!</b><br>You must delete child records first then you should delete this item to ensure referential integrity.']);
+                } else {
+                    return response()->json(['success'=>'false', 'message'=>'Something Went Wrong! Please Try Again Later.']);
+                }
+            }
+        }
+
+        return response()->json(['success'=>'false', 'message'=>'Something went wrong. Please try again later']);
+    }
+
     public function reset(Request $request){
 
     	Config::set("database.connections.sqlite", [
@@ -506,8 +598,27 @@ class ImportExportsController extends Controller
 
     	if($session_id != '' && $district_id != '' && $skip_records != '' && $limit_records != ''){
 	    	if($skip_records >= $count_records) {	
-	    		$students = Student::where('session_id', $session_id)->where('district_id', $district_id)->orderBy('id', 'ASC')->skip($skip_records)->take($limit_records)->get();
+	    		$students = Student::join('institutions', 'institutions.id', '=', 'students.center_id')->join('tehsils', 'tehsils.id', '=', 'institutions.tehsil_id')->join('districts', 'districts.id', '=', 'tehsils.district_id')->where('students.session_id', $session_id)->where('districts.id', $district_id)->groupBy('students.id')->orderBy('students.id', 'ASC')->skip($skip_records)->take($limit_records)->get([
+	    				'students.id',
+						'students.name',
+						'students.father_name',
+						'students.gender',
+						'students.date_of_birth',
+						'students.dob_in_words',
+						'students.home_address',
+						'students.cell_no',
+						'students.email',
+						'students.image',
+						'students.student_type',
+						'students.class_id',
+						'students.session_id',
+						'students.institution_id',
+						'students.center_id',
+						'students.created_at',
+						'students.updated_at'
+	    			]);
 
+	    		$i=0;
 	    		foreach($students as $student){
 	    			$data = [
 		        		$student->id,
@@ -558,7 +669,6 @@ class ImportExportsController extends Controller
 			        	
 			        	DB::connection('sqlite')->insert('INSERT INTO students_semesters (id, semester_id, student_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)', $data2);
 					}
-
 					/*$studentsfees = StudentsFee::where('student_id', $student->id)->get();
 
 					foreach($studentsfees as $studentsfee) {

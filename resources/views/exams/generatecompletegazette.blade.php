@@ -1034,7 +1034,8 @@
                               class: 'bg-warning',
                                   title: 'Processing!',
                                   autohide: false,
-                                  body: '<span id="loading_toast">Please wait until the success message appears</span>'
+                                  close: false,
+                                  body: '<div id="loading_toast" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><span style="position: relative;top:-8px;left: 3px;"><strong>Please wait for the success meassage</strong></span>'
                             });
                           },
                           complete: function() {

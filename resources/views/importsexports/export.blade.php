@@ -88,9 +88,9 @@
                                 <option value="">Select District</option> 
                                 @foreach($districts as $district)
                                     @if($district->id == Request::old('district_id'))
-                                        <option selected value="{{ $district->id }}">{{ $district->name }}</option>
+                                        <option selected value="{{ $district->id }}">{{ $district->name }}&nbsp;&nbsp;&nbsp;({{ $district->getTotalStudents($district->id) }})</option>
                                     @else
-                                        <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                        <option value="{{ $district->id }}">{{ $district->name }}&nbsp;&nbsp;&nbsp;({{ $district->getTotalStudents($district->id) }})</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -145,11 +145,192 @@
     </section>
     <!-- /.content -->
 
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <div class="card-header row">
+                <div class="col-lg-12">
+                  <h3 class="card-title custom-card-title">Exported Records Shown here.</h3>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div id="buttons_container">
+                  <table id="manageDatatable" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                      <th>Roll No</th>
+                      <th>Name</th>
+                      <th>Father Name</th>
+                      <th>District</th>
+                      <th>Class</th>
+                      <th>Institution</th>
+                      <th>Center</th>
+                      <th>Action</th>
+                    </tr>
+                    </thead>
+                  </table>
+               </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+    <div class="modal" id="modal-danger" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Are you sure?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="yes-btn" class="btn btn-danger">Yes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 @stop
 
 
 @push('scripts')
 <script>
+
+  $(document).ready(function(){
+    $('body').on('click', '#dlt_button', function (){
+      id = $(this).data('districtid');
+      url = $(this).data('url');
+
+      $.confirm({
+          title: 'Are you sure?',
+          content: 'Simple confirm!',
+          buttons: {
+              yes: {
+                  text: 'Yes',
+                  btnClass: 'btn-red',
+                  keys: ['enter', 'shift'],
+                  action: function(){
+                      $.ajax({
+                  headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                        type: "POST",
+                        url: url,
+                        data: {id:id},
+
+                        beforeSend: function()
+                        {
+                          $('#modal-danger').modal('hide');
+                          Pace.start();
+                        },
+                        complete: function() {
+                          Pace.stop();
+                          $('#modal-danger').modal('hide');
+                        },
+                        success: function(data)
+                        {
+                          if(data['success'] == 'true'){
+
+                            $('input[name="skip_records"]').val(data['total_students']);
+                            $('#total_records').text(data['total_students']);
+
+                            var oTable = $('#manageDatatable').dataTable(); 
+                            oTable.fnDraw(false);
+
+                            var successToast = $(document).Toasts('create', {
+                              class: 'bg-success',
+                                  title: 'Success!',
+                                  autohide: true,
+                                  delay: 2000,
+                                  body: data['message']
+                            });
+                          } else {
+                            var errorToast = $(document).Toasts('create', {
+                            class: 'bg-danger',
+                                title: 'Oops!',
+                                autohide: true,
+                                delay: 2000,
+                                body: data['message']
+                            });
+                          }
+                        }
+                    });
+                  }
+              },
+              no: {
+                  text: 'No',
+                  btnClass: 'btn-grey',
+                  keys: ['enter', 'shift'],
+                  action: function(){
+
+                  }
+              }
+          }
+      });
+    });
+  }); 
+
+    $(document).ready(function() {
+        $('#manageDatatable').DataTable({
+            processing:true,
+            serverSide:true,
+            ajax:{
+              url: "{{ route('importsexports.getexporteddata') }}",
+            },
+            columns:[
+              {
+                data: 'id',
+                name: 'id'
+              },
+              {
+                data: 'name',
+                name: 'name'
+              },
+              {
+                data: 'father_name',
+                name: 'father_name'
+              },
+              {
+                data: 'district_name',
+                name: 'district_name'
+              },
+              {
+                data: 'class_name',
+                name: 'class_name'
+              },
+              {
+                data: 'institution_name',
+                name: 'institution_name'
+              },
+              {
+                data: 'center_name',
+                name: 'center_name'
+              },
+              {
+                data: 'action',
+                name: 'action',
+                orderable:false
+              }
+            ],
+            "order": [[ 0, "desc" ]]
+        });
+    });
 
   $(document).ready(function(){
     $('body').on('click', '#reset_btn_stds', function (){
@@ -188,6 +369,7 @@
                                   delay: 2000,
                                   body: data['message']
                             });
+                            window.location.reload();
                           } else {
                             var errorToast = $(document).Toasts('create', {
                               class: 'bg-danger',
@@ -310,7 +492,8 @@
                               class: 'bg-warning',
                                   title: 'Processing!',
                                   autohide: false,
-                                  body: '<span id="loading_toast">Please wait until the success message appears</span>'
+                                  close: false,
+                                  body: '<div id="loading_toast" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><span style="position: relative;top:-8px;left: 3px;"><strong>Please wait for the success meassage</strong></span>'
                             });
                           },
                           complete: function() {
@@ -362,6 +545,7 @@
     if($('#quickForm').valid()){
 
       var session_id = $('select[name="session_id"]').val();
+      var district_id = $('select[name="district_id"]').val();
       var limit_records = $('input[name="limit_records"]').val();
       var skip_records = $('input[name="skip_records"]').val();
       var count_records = $('#total_records').text();
@@ -377,6 +561,7 @@
           url: url,
           data: {
               session_id:session_id,
+              district_id:district_id,
               limit_records:limit_records,
               skip_records:skip_records,
               count_records:count_records
@@ -390,7 +575,8 @@
               class: 'bg-warning',
                   title: 'Processing!',
                   autohide: false,
-                  body: '<span id="loading_toast">Please wait until the success message appears</span>'
+                  close: false,
+                  body: '<div id="loading_toast" class="spinner-border" role="status"><span class="sr-only">Loading...</span></div><span style="position: relative;top:-8px;left: 3px;"><strong>Please wait for the success meassage</strong></span>'
             });
           },
           complete: function() {
@@ -401,6 +587,9 @@
           success: function(data)
           {
             if(data['success'] == 'true'){
+
+              var oTable = $('#manageDatatable').dataTable(); 
+              oTable.fnDraw(false);
 
               $('input[name="skip_records"]').val(data['skip_records']);
               $('input[name="limit_records"]').val(data['limit_records']);

@@ -130,6 +130,7 @@
 				                success: function(data)
 				                {
 				                	if(data['success'] == 'true'){
+				                		/*$('#manageDatatable').ajax.reload('null', false);*/
 				                		var oTable = $('#manageDatatable').dataTable(); 
 										oTable.fnDraw(false);
 										var successToast = $(document).Toasts('create', {

@@ -231,10 +231,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/exams/storedatabystudents', [ExamsController::class, 'storedatabystudents'])->name('exams.storedatabystudents');
 	
 	Route::get('/importsexports/export', [ImportExportsController::class, 'export'])->name('importsexports.export');
+	Route::get('/importsexports/getexporteddata', [ImportExportsController::class, 'getexporteddata'])->name('importsexports.getexporteddata');
 	Route::post('/importsexports/reset', [ImportExportsController::class, 'reset'])->name('importsexports.reset');
 	Route::post('/importsexports/set', [ImportExportsController::class, 'set'])->name('importsexports.set');
 	Route::post('/importsexports/exportstudents', [ImportExportsController::class, 'exportstudents'])->name('importsexports.exportstudents');
 	Route::post('/importsexports/resetstudents', [ImportExportsController::class, 'resetstudents'])->name('importsexports.resetstudents');
+	Route::post('/importsexports/destroystudents', [ImportExportsController::class, 'destroystudents'])->name('importsexports.destroystudents');
 
 	Route::get('/importsexports/import', [ImportExportsController::class, 'import'])->name('importsexports.import');
 	Route::post('/importsexports/importstudents', [ImportExportsController::class, 'importstudents'])->name('importsexports.importstudents');

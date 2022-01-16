@@ -15,4 +15,9 @@ class District extends Model
 	public static $rules = array(
 		'name'=>'required|min:3'
 	);
+
+	public function getTotalStudents($district_id){
+		$count = Student::join('institutions', 'institutions.id', '=', 'students.center_id')->join('tehsils', 'tehsils.id', '=', 'institutions.tehsil_id')->join('districts', 'districts.id', '=', 'tehsils.district_id')->where('districts.id', $district_id)->count();
+		return $count;
+	}
 }
