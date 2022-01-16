@@ -41,58 +41,41 @@
 	              </div>
 	            @endif
               <!-- form start -->
-              <form id="quickForm" method="post" action="{{ route('students.update') }}" enctype="multipart/form-data">
+              <form id="quickForm" method="post" action="{{ route('students.store') }}"enctype="multipart/form-data">
               	{{ csrf_field() }}
-                <input id="hidden_identifier" type="hidden" value="{{ $student->id }}" name="student_id">
-                <input type="hidden" value="1" name="is_edit">
+                
                 <div class="card-body">
-                  <div class="form-group">
-                    <label for="labelInputSelectSession">Select Session<i class="fa fa-star-of-life required-label"></i></label>
-                    <select class="custom-select rounded-0 select2" id="labelInputSelectSession" name="session_id">
-                      @foreach($sessions as $session)
-                          @if(Request::old('session_id') == '')
-                              @if($session->id == $student->session_id)
-                                  <option data-expirydate="{{ str_replace('-', '/', $session->expiry_date) }}" selected value="{{ $session->id }}">{{ $session->title }}</option>
-                              @else
-                                  <option data-expirydate="{{ str_replace('-', '/', $session->expiry_date) }}" value="{{ $session->id }}">{{ $session->title }}</option>
-                              @endif
-                          @else
+                    <div class="form-group">
+                      <label for="labelInputSelectSession">Select Session<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0 select2" id="labelInputSelectSession" name="session_id">
+                          @foreach($sessions as $session)
                               @if($session->id == Request::old('session_id'))
                                   <option data-expirydate="{{ str_replace('-', '/', $session->expiry_date) }}" selected value="{{ $session->id }}">{{ $session->title }}</option>
                               @else
                                   <option data-expirydate="{{ str_replace('-', '/', $session->expiry_date) }}" value="{{ $session->id }}">{{ $session->title }}</option>
                               @endif
-                          @endif
-                      @endforeach
-                    </select>
+                          @endforeach
+                      </select>
                    </div>
                    <div class="form-group">
-                    <label for="labelInputSelectClass">Select Class<i class="fa fa-star-of-life required-label"></i></label>
-                    <select class="custom-select rounded-0" id="labelInputSelectClass" name="class_id">
-                      @foreach($standards as $standard)
-                          @if(Request::old('class_id') == '')
-                              @if($standard->id == $student->class_id)
-                                  <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" selected value="{{ $standard->id }}">{{ $standard->name }}</option>
-                              @else
-                                  <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" value="{{ $standard->id }}">{{ $standard->name }}</option>
-                              @endif
-                          @else
-                              @if($standard->id == Request::old('class_id'))
-                                  <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" selected value="{{ $standard->id }}">{{ $standard->name }}</option>
-                              @else
-                                  <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" value="{{ $standard->id }}">{{ $standard->name }}</option>
-                              @endif
-                          @endif
-                      @endforeach
-                    </select>
+                      <label for="labelSelectClass">Select Class<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0" id="labelSelectClass" name="class_id"> 
+                          @foreach($standards as $standard)
+                            @if($standard->id == Request::old('class_id'))
+                                <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" selected value="{{ $standard->id }}">{{ $standard->name }}</option>
+                            @else
+                                <option data-minage="{{ $standard->min_age }}" data-minsubjects="{{ $standard->min_subjects }}" value="{{ $standard->id }}">{{ $standard->name }}</option>
+                            @endif
+                          @endforeach
+                      </select>
                    </div>
-                   <div class="form-group">
+                    <div class="form-group">
                       <label for="labelInputStudentName">Student Name<i class="fa fa-star-of-life required-label"></i></i></label>
-                      <input type="text" name="name" class="form-control" id="labelInputStudentName" placeholder="Enter student name" value="{{ Request::old('name')!='' ? Request::old('name'):$student->name }}">
+                      <input type="text" name="name" class="form-control" id="labelInputStudentName" placeholder="Enter student name" value="{{ Request::old('name') }}">
                    </div>
                    <div class="form-group">
                       <label for="labelInputFatherName">Father Name<i class="fa fa-star-of-life required-label"></i></i></label>
-                      <input type="text" name="father_name" class="form-control" id="labelInputFatherName" placeholder="Enter father name" value="{{ Request::old('father_name') != '' ? Request::old('father_name') : $student->father_name }}">
+                      <input type="text" name="father_name" class="form-control" id="labelInputFatherName" placeholder="Enter father name" value="{{ Request::old('father_name') }}">
                    </div>
                    <div class="form-group">
                       <label>Date Of Birth<i class="fa fa-star-of-life required-label"></i></label>
@@ -100,28 +83,23 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                         </div>
-                        <input id="datemask" type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="" inputmode="numeric" name="date_of_birth" value="{{ Request::old('date_of_birth') != '' ? Request::old('date_of_birth') : date('d-m-Y', strtotime($student->date_of_birth)) }}">
+                        <input id="datemask" type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="" inputmode="numeric" name="date_of_birth" value="{{ Request::old('date_of_birth') }}">
                       </div>
                     </div>
                     <div class="form-group">
                       <label for="labelInputDOBInWords">DOB (In Words)<i class="fa fa-star-of-life required-label"></i></i></label>
-                      <input type="text" name="dob_in_words" class="form-control" id="labelInputDOBInWords" placeholder="Enter date of birth (in words)" value="{{ Request::old('dob_in_words') != '' ? Request::old('dob_in_words') : $student->dob_in_words }}">
+                      <input type="text" name="dob_in_words" class="form-control" id="labelInputDOBInWords" placeholder="Enter date of birth (in words)" value="{{ Request::old('dob_in_words') }}">
                    </div>
                    <div class="form-group">
-                        <label for="labelInputGender">Gender<i class="fa fa-star-of-life required-label"></i></label>
-                        <select class="custom-select rounded-0" id="labelInputGender" name="gender">
-                        @if(Request::old('gender') != '')
-                            <option value="0" {{ Request::old('gender') == 0 ? 'selected':'' }}>MALE</option>
-                            <option value="1" {{ Request::old('gender') == 1 ? 'selected':'' }}>FEMALE</option>
-                        @else
-                          <option value="0" {{ auth()->user()->gender == 0 ? 'selected':'' }}>MALE</option>
-                            <option value="1" {{ auth()->user()->gender == 1 ? 'selected':'' }}>FEMALE</option>
-                        @endif
-                        </select>
-                     </div>
+                    <label for="labelInputGender">Gender<i class="fa fa-star-of-life required-label"></i></label>
+                    <select class="custom-select rounded-0" id="labelInputGender" name="gender">
+                      <option value="0" {{ Request::old('gender') == 1 ? 'selected':'' }}>Male</option>
+                      <option value="1" {{ Request::old('gender') == 0 ? 'selected':'' }}>Female</option>
+                    </select>
+                   </div>
                    <div class="form-group">
                       <label for="labelInputHomeAddress">Home Address<i class="fa fa-star-of-life required-label"></i></i></label>
-                      <input type="text" name="home_address" class="form-control" id="labelInputHomeAddress" placeholder="Enter date of birth (in words)" value="{{ Request::old('home_address') != '' ? Request::old('home_address') : $student->home_address }}">
+                      <input type="text" name="home_address" class="form-control" id="labelInputHomeAddress" placeholder="Enter date of birth (in words)" value="{{ Request::old('home_address') }}">
                    </div>
                    <div class="form-group">
                       <label>Cell No</label>
@@ -129,12 +107,12 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text"><i class="far fa fa-mobile-alt"></i></span>
                         </div>
-                        <input type="text" class="form-control" data-inputmask="'mask': '0399-9999999'" data-mask="" inputmode="text" name="cell_no" value="{{ Request::old('cell_no') != '' ? Request::old('cell_no') : $student->cell_no }}">
+                        <input type="text" class="form-control" data-inputmask="'mask': '0399-9999999'" data-mask="" inputmode="text" name="cell_no" value="{{ Request::old('cell_no') }}">
                       </div>
                     </div>
                     <div class="form-group">
-                      <label for="labelInputEmail">Email</label>
-                      <input type="text" name="email" class="form-control" id="labelInputEmail" placeholder="Enter email" value="{{ Request::old('email') != '' ? Request::old('email') : $student->email }}">
+                      <label for="labelInputEmail">Email</i></label>
+                      <input type="text" name="email" class="form-control" id="labelInputEmail" placeholder="Enter email" value="{{ Request::old('email') }}">
                    </div>
                    <div class="form-group">
                       <label for="exampleInputFile">Upload Photo (Passport Size)<i class="fa fa-star-of-life required-label"></i></label>
@@ -148,68 +126,43 @@
                    <div class="form-group">
                     <label for="labelInputStudentType">Student Type<i class="fa fa-star-of-life required-label"></i></label>
                     <select class="custom-select rounded-0" id="labelInputStudentType" name="student_type">
-                      @if(Request::old('student_type')!='')
-                        <option value="1" {{ Request::old('student_type') == 1 ? 'selected':'' }}>PRIVATE</option>
-                        <option value="0" {{ Request::old('student_type') == 0 ? 'selected':'' }}>REGULAR</option>
-                      @else
-                        <option value="1" {{ $student->student_type == 1 ? 'selected' : '' }}>PRIVATE</option>
-                        <option value="0" {{ $student->student_type == 0 ? 'selected' : '' }}>REGULAR</option>
-                      @endif
+                      <option value="1" {{ Request::old('student_type') == 1 ? 'selected':'' }}>PRIVATE</option>
+                      <option value="0" {{ Request::old('student_type') == 0 ? 'selected':'' }}>REGULAR</option>
                     </select>
                    </div>
                    <div class="form-group">
-                    <label for="labelInputSelectInstitution">Select Institution<i class="fa fa-star-of-life required-label"></i></label>
-                    <select class="custom-select rounded-0 select2" id="labelInputSelectInstitution" name="institution_id">
-                      <option value="">Select a Institution</option> 
-                      @foreach($institutions as $institution)
-                          @if(Request::old('institution_id') == '')
-                              @if($institution->id == $student->institution_id)
-                                  <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
-                              @else
-                                  <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                              @endif
-                          @else
-                              @if($institution->id == Request::old('institution_id'))
-                                  <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
-                              @else
-                                  <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                              @endif
-                          @endif
-                      @endforeach
-                    </select>
-                   </div>
-                   <div class="form-group">
-                    <label for="labelInputSelectCenter">Select Center<i class="fa fa-star-of-life required-label"></i></label>
-                    <select class="custom-select rounded-0 select2" id="labelInputSelectCenter" name="center_id">
-                      <option value="">Select a Center</option> 
-                      @foreach($institutions as $institution)
-                          @if($institution->is_center == 1)
-                            @if(Request::old('center_id') == '')
-                                @if($institution->id == $student->center_id)
-                                    <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
-                                @else
-                                    <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                                @endif
+                      <label for="labelSelectInstitution">Select Institution<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0 select2" id="labelSelectInstitution" name="institution_id">
+                          <option value="">Select Institution</option> 
+                          @foreach($institutions as $institution)
+                            @if($institution->id == Request::old('institution_id'))
+                                <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
                             @else
-                                @if($institution->id == Request::old('center_id'))
-                                    <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
-                                @else
-                                    <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                                @endif
+                                <option value="{{ $institution->id }}">{{ $institution->name }}</option>
                             @endif
-                          @endif
-                      @endforeach
-                    </select>
+                          @endforeach
+                      </select>
+                   </div>
+                   <div class="form-group">
+                      <label for="labelSelectCenter">Select Center<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0 select2" id="labelSelectCenter" name="center_id">
+                          <option value="">Select Center</option> 
+                          @foreach($institutions as $institution)
+                            @if($institution->is_center == 1)
+                              @if($institution->id == Request::old('center_id'))
+                                  <option selected value="{{ $institution->id }}">{{ $institution->name }}</option>
+                              @else
+                                  <option value="{{ $institution->id }}">{{ $institution->name }}</option>
+                              @endif
+                            @endif
+                          @endforeach
+                      </select>
                    </div>
                    <div class="form-group">
                       <label for="labelSelectSubjects">Select Subjects<i class="fa fa-star-of-life required-label"></i></label>
                       <select class="custom-select rounded-0 select2" id="labelSelectSubjects" name="subject_id[]" multiple="true">
                           @foreach($subjects as $subject)
-                            @if($students_subjects->contains('subject_id', $subject->id))
-                              <option selected value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @else
-                              <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @endif
+                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                           @endforeach
                       </select>
                    </div>
@@ -245,29 +198,60 @@
     var url = "{{ route('students.getsubjectsgroupdata') }}";
 
     $.ajax({
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    },
-            type: "POST",
-            url: url,
-            data: {class_id:class_id},
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: "POST",
+        url: url,
+        data: {class_id:class_id},
+        beforeSend: function()
+        {
+          $('#modal-danger').modal('hide');
+          Pace.start();
+        },
+        complete: function() {
+          Pace.stop();
+          $('#modal-danger').modal('hide');
+        },
+        success: function(data)
+        {
+          data_arr = JSON.parse(data);
 
-            beforeSend: function()
-            {
-              $('#modal-danger').modal('hide');
-              Pace.start();
-            },
-            complete: function() {
-              Pace.stop();
-              $('#modal-danger').modal('hide');
-            },
-            success: function(data)
-            {
-              var data_arr = JSON.parse(data);
+          $('select[name="subject_id[]"]').select2().val(data_arr).trigger('change');
+        }
+    });
 
-              $('select[name="subject_id[]"]').val(data_arr).trigger("change");
-            }
-        });
+  });
+
+  $(document).ready(function(){
+    var class_id = $('select[name="class_id"]').val();
+    var url = "{{ route('students.getsubjectsgroupdata') }}";
+
+    $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: "POST",
+        url: url,
+        data: {
+          class_id: class_id
+        },
+        beforeSend: function()
+        {
+          $('#modal-danger').modal('hide');
+          Pace.start();
+        },
+        complete: function() {
+          Pace.stop();
+          $('#modal-danger').modal('hide');
+        },
+        success: function(data)
+        {
+          data_arr = JSON.parse(data);
+
+          $('select[name="subject_id[]"]').select2().val(data_arr).trigger('change');
+        }
+    });
   });
 
   var ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
@@ -441,7 +425,7 @@
 
 
 
-  var validatevar = $('#quickForm').validate({
+	var validatevar = $('#quickForm').validate({
       rules: {
         name: {
           required: true,
@@ -558,76 +542,6 @@
   }).change(function(){
       $('#quickForm').valid();
   });
-
-  /*$(document.body).on("change","select[name='fee_id']" ,function(){
-    var s_type = $('#quickForm select[name="student_type"]').val();
-    var s_class = $('#quickForm select[name="s_class"]').val();
-
-    $('#quickForm select[name="fee_id"]').select2({
-      ajax: {
-        url: "{{ route('students.getFeeData') }}",
-        dataType: 'json',
-        data: function (params) {
-            return {
-              _token: '{{ csrf_token() }}',
-              s_type:s_type,
-              s_class:s_class,
-              search: params.term // search term
-            };
-          },
-          beforeSend: function()
-          {
-            Pace.start();
-          },
-          complete: function() {
-            Pace.stop();
-          },
-          processResults: function (response) {
-            return {
-              results: response
-            };
-          },
-          cache: true
-      }
-    }).change(function(){
-        $(this).valid();
-    });
-  });*/
-
-  /*$(document).ready(function(){
-    var s_type = $('#quickForm select[name="student_type"]').val();
-    var s_class = $('#quickForm select[name="s_class"]').val();
-
-    $('#quickForm select[name="fee_id"]').select2({
-      ajax: {
-        url: "{{ route('students.getFeeData') }}",
-        dataType: 'json',
-        data: function (params) {
-            return {
-              _token: '{{ csrf_token() }}',
-              s_type:s_type,
-              s_class:s_class,
-              search: params.term // search term
-            };
-          },
-          beforeSend: function()
-          {
-            Pace.start();
-          },
-          complete: function() {
-            Pace.stop();
-          },
-          processResults: function (response) {
-            return {
-              results: response
-            };
-          },
-          cache: true
-      }
-    }).change(function(){
-        $(this).valid();
-    });
-  });*/
 
 </script>
 

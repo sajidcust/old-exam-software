@@ -308,7 +308,7 @@ class StudentsController extends Controller
         $sessions = Session::all();
         $subjects = Subject::all();
         $standards = Standard::all();
-        return view('students.create')
+        return view('students.createsearchedstudent')
             ->with('institutions', $institutions)
             ->with('sessions', $sessions)
             ->with('subjects', $subjects)
@@ -344,6 +344,23 @@ class StudentsController extends Controller
            $response[] = array(
               "id"=>$fee->id,
               "text"=>$fee->title
+         );
+        }
+        echo json_encode($response);
+        exit;
+    }
+
+    public function getSubjectsData(Request $request){
+        $s_class = $request->input('s_class');
+
+        //$selectedsubjects = SubjectsGroup::join('subjects', 'subjects.id', '=', 'subjects_groups.subject_id')->where('subjects_groups.class_id', $s_class)->get(['subjects.id', 'subjects.name']);
+        $subjects = Subject::all();
+
+        $response = array();
+        foreach($subjects as $subject){
+           $response[] = array(
+              "id"=>$subject->id,
+              "text"=>$subject->name
          );
         }
         echo json_encode($response);

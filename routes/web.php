@@ -91,6 +91,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::get('/students/editsearchedstudent/{id}/{session_id}/{class_id}/{center_id}', [StudentsController::class, 'editsearchedstudent']);
 	Route::post('/students/update', [StudentsController::class, 'update'])->name('students.update');
 	Route::get('/students/getFeeData', [StudentsController::class, 'getFeeData'])->name('students.getFeeData');
+	Route::get('/students/getSubjectsData', [StudentsController::class, 'getSubjectsData'])->name('students.getSubjectsData');
 	Route::get('/students/updatefee/{id}/{semester_id}', [StudentsController::class, 'updatefee']);
 	Route::get('/students/updatefeebysearch/{id}/{semester_id}/{session_id}/{class_id}/{center_id}', [StudentsController::class, 'updatefeebysearch']);
 	Route::post('/students/storefee', [StudentsController::class, 'storefee'])->name('students.storefee');

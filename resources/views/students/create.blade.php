@@ -43,12 +43,6 @@
               <!-- form start -->
               <form id="quickForm" method="post" action="{{ route('students.store') }}"enctype="multipart/form-data">
               	{{ csrf_field() }}
-
-                @if(isset($session_id))
-                  <input type="hidden" name="session_id" value="{{ $session_id }}">
-                  <input type="hidden" name="class_id" value="{{ $class_id }}">
-                  <input type="hidden" name="center_id" value="{{ $center_id }}">
-                @endif
                 <div class="card-body">
                     <div class="form-group">
                       <label for="labelInputSelectSession">Select Session<i class="fa fa-star-of-life required-label"></i></label>
@@ -221,8 +215,7 @@
         success: function(data)
         {
           data_arr = JSON.parse(data);
-
-          $('select[name="subject_id[]"]').val(data_arr).trigger("change");
+          $('select[name="subject_id[]"]').select2().val(data_arr).trigger('change');
         }
     });
   });
@@ -252,7 +245,9 @@
         success: function(data)
         {
           data_arr = JSON.parse(data);
-          $('select[name="subject_id[]"]').val(data_arr).trigger('change');
+
+          $('select[name="subject_id[]"]').select2().val(data_arr).trigger('change');
+
         }
     });
 
