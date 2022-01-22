@@ -62,7 +62,7 @@ class StudentsController extends Controller
                             s.home_address,
                             s.cell_no,
                             s.email,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             (
@@ -730,7 +730,7 @@ class StudentsController extends Controller
                             s.home_address,
                             s.cell_no,
                             s.email,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             s.class_id,
                             s.center_id,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,

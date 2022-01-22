@@ -5,8 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Nomination;
-use App\Models\NominationPrequalification;
+use App\Models\Session;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +29,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrap();
+
+        Validator::extend('isoneactive', function ($attribute, $value, $parameters, $validator) {
+
+            if($value) {
+                $count_previous_actives = Session::where('is_active', 1)->count();
+
+                if($count_previous_actives == 0){
+                    return true;
+                }
+
+                return false;
+            }
+
+            return true;
+        }, 'only one session can be active at a time.');
+
         Validator::extend('yeargtcurrentyear', function ($attribute, $value, $parameters, $validator) {
             $currentyear = (int)date("Y");
             $enteredyear = (int)$value;

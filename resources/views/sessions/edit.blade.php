@@ -62,6 +62,18 @@
                         <input id="datemask" type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="" inputmode="numeric" name="expiry_date" value="{{ Request::old('expiry_date') != '' ? Request::old('expiry_date') : date('d-m-Y', strtotime($session->expiry_date)) }}">
                       </div>
                     </div>
+                    <div class="form-group">
+                      <label for="labelInputIsActive">Is Active<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0" id="labelInputIsActive" name="is_active">
+                      @if(Request::old('is_active') != '')
+                          <option value="0" {{ Request::old('is_active') == 0 ? 'selected':'' }}>NO</option>
+                          <option value="1" {{ Request::old('is_active') == 1 ? 'selected':'' }}>YES</option>
+                      @else
+                        <option value="0" {{ $session->is_active == 0 ? 'selected':'' }}>NO</option>
+                          <option value="1" {{ $session->is_active == 1 ? 'selected':'' }}>YES</option>
+                      @endif
+                      </select>
+                   </div>
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
@@ -121,6 +133,9 @@
         },
         expiry_date: {
           required:true
+        },
+        is_active: {
+          required: true
         }
 	    },
 	    errorElement: 'span',

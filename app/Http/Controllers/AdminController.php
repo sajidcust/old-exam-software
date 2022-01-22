@@ -311,7 +311,6 @@ class AdminController extends Controller
 
         exit;*/
 
-
         $this->selected_sub_menu = "admin_dashboard";
         $this->card_title = "Admin Dashboard";
 

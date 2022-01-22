@@ -61,6 +61,13 @@
                         <input id="datemask" type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="" inputmode="numeric" name="expiry_date" value="{{ Request::old('expiry_date') }}">
                       </div>
                     </div>
+                    <div class="form-group">
+                      <label for="labelInputIsActive">Is Active<i class="fa fa-star-of-life required-label"></i></label>
+                      <select class="custom-select rounded-0" id="labelInputIsActive" name="is_active">
+                        <option value="0" {{ Request::old('is_active') == 0 ? 'selected':'' }}>NO</option>
+                        <option value="1" {{ Request::old('is_active') == 1 ? 'selected':'' }}>YES</option>
+                      </select>
+                     </div>
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
@@ -107,6 +114,51 @@
         return isGreaterThanCurrentYear(value);
     }, "Year cannot be greater than current year.");
 
+    var isActiveAlready = function(value){
+      var is_active = true;
+      if(parseInt(value) == 1) {
+
+        $.ajax({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          type: "POST",
+          url: "{{ route('sessions.activesessions') }}",
+          data: {
+            value: value
+          },
+          async:false,
+          beforeSend: function()
+          {
+            $('#modal-danger').modal('hide');
+            Pace.start();
+          },
+          complete: function() {
+            Pace.stop();
+            $('#modal-danger').modal('hide');
+          },
+          success: function(data)
+          {
+            if(parseInt(data) == 0){
+              is_active = true;
+            } else {
+              is_active = false;
+            }
+          }
+        });
+
+      }
+
+      alert(is_active);
+
+      return is_active;
+    };
+
+    jQuery.validator.addMethod("isActiveAlready", function(value, element) {
+
+        return isActiveAlready(value);
+    }, "Year cannot be greater than current year.");
+
 	var validatevar = $('#quickForm').validate({
 	    rules: {
 	      title: {
@@ -120,6 +172,9 @@
         },
         expiry_date: {
           required: true
+        },
+        is_active: {
+          required:true
         }
 	    },
 	    errorElement: 'span',

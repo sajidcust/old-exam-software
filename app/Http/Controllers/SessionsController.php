@@ -36,7 +36,7 @@ class SessionsController extends Controller
 
         if(request()->ajax())
         {
-            return datatables()->of(Session::select('sessions.id', 'sessions.title', 'sessions.year', DB::raw($expiry_date), 'sessions.created_at', 'sessions.updated_at')->get())
+            return datatables()->of(Session::select('sessions.id', 'sessions.title', 'sessions.year', DB::raw($expiry_date), DB::raw("(CASE  WHEN sessions.is_active=0 THEN 'NO' ELSE 'YES' END) AS is_active"), 'sessions.created_at', 'sessions.updated_at')->get())
                     ->addColumn('action', function($data){
                         $button = '<a href="'.url('admin/sessions/edit/'.$data->id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span></a>';
                         $button .='&nbsp;&nbsp;';
@@ -53,6 +53,16 @@ class SessionsController extends Controller
             ->with('card_title', $this->card_title)
             ->with('selected_sub_menu', $this->selected_sub_menu)
             ->with('page_title', $this->page_title);
+    }
+
+    public function activesessions(Request $request){
+        $count_previous_actives = Session::where('is_active', 1)->count();
+
+        if($count_previous_actives == 0){
+            return 1;
+        }
+
+        return 0;
     }
 
     /**
@@ -87,6 +97,7 @@ class SessionsController extends Controller
             $session->title = $request->input('title');
             $session->year = $request->input('year');
             $session->expiry_date = date('Y-m-d', strtotime($request->input('expiry_date')));
+            $session->is_active = $request->input('is_active');
             $session->save();
 
             return Redirect::to('admin/sessions/index')
@@ -152,6 +163,7 @@ class SessionsController extends Controller
                 $session->title = $request->input('title');
                 $session->year = $request->input('year');
                 $session->expiry_date = date('Y-m-d', strtotime($request->input('expiry_date')));
+                $session->is_active = $request->input('is_active');
                 $session->save();
 
                 return Redirect::to('admin/sessions/index')

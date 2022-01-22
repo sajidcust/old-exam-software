@@ -319,41 +319,39 @@ class ImportExportsController extends Controller
         $ss = DB::connection('sqlite')->select("SELECT * FROM sessions;");
 
         if(count($ss)==0) {
-	        $sessions = Session::all();
-	        foreach($sessions as $session){
+	        $session = Session::where('is_active', 1)->first();
 	        	
-	        	$data = [
-	        		$session->id, 
-	        		$session->title, 
-	        		$session->year, 
-	        		$session->expiry_date,
-	        		$session->created_at, 
-	        		$session->updated_at
-	        	];
-	        	
-	        	DB::connection('sqlite')->insert('INSERT INTO sessions (id, title, year, expiry_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', $data);
-	        }
-	    }
+        	$data = [
+        		$session->id, 
+        		$session->title, 
+        		$session->year, 
+        		$session->expiry_date,
+        		$session->created_at, 
+        		$session->updated_at
+        	];
+        	
+        	DB::connection('sqlite')->insert('INSERT INTO sessions (id, title, year, expiry_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', $data);
 
-        //Semesters
+            //Semesters
 
-        $sms = DB::connection('sqlite')->select("SELECT * FROM semesters;");
+            $sms = DB::connection('sqlite')->select("SELECT * FROM semesters;");
 
-        if(count($sms)==0) {
-	        $semesters = Semester::all();
-	        foreach($semesters as $semester){
-	        	
-	        	$data = [
-	        		$semester->id, 
-	        		$semester->title, 
-	        		$semester->session_id, 
-	        		$semester->division_percentage, 
-	        		$semester->created_at, 
-	        		$semester->updated_at
-	        	];
-	        	
-	        	DB::connection('sqlite')->insert('INSERT INTO semesters (id, title, session_id, division_percentage, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', $data);
-	        }
+            if(count($sms)==0) {
+                $semesters = Semester::where('session_id', $session->id)->get();
+                foreach($semesters as $semester){
+                    
+                    $data = [
+                        $semester->id, 
+                        $semester->title, 
+                        $semester->session_id, 
+                        $semester->division_percentage, 
+                        $semester->created_at, 
+                        $semester->updated_at
+                    ];
+                    
+                    DB::connection('sqlite')->insert('INSERT INTO semesters (id, title, session_id, division_percentage, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', $data);
+                }
+            }
 	    }
 
         //Fees
@@ -798,8 +796,6 @@ class ImportExportsController extends Controller
 		    	$std->session_id = $student->session_id;  
 		    	$std->institution_id = $student->institution_id;  
 		    	$std->center_id = $student->center_id;  
-        		$std->created_at = $student->created_at; 
-        		$std->updated_at = $student->updated_at;
         		$std->save();
 
         		$studentssubjects = DB::connection('sqlite')->select('SELECT * FROM students_subjects WHERE student_id = '.$student->id.';');
@@ -808,8 +804,6 @@ class ImportExportsController extends Controller
 					$stdsub = new StudentsSubject;
 	        		$stdsub->student_id = $std->id;
 			    	$stdsub->subject_id = $stdsubject->subject_id; 
-	        		$stdsub->created_at = $stdsubject->created_at; 
-	        		$stdsub->updated_at = $stdsubject->updated_at;
 	        		$stdsub->save();
 				}
 
@@ -821,10 +815,33 @@ class ImportExportsController extends Controller
 					$stdssemester = new StudentsSemester;
 					$stdssemester->semester_id = $studentssemester->semester_id; 
 	        		$stdssemester->student_id = $std->id;
-	        		$stdssemester->created_at = $studentssemester->created_at; 
-	        		$stdssemester->updated_at = $studentssemester->updated_at;
 	        		$stdssemester->save();
 				}
+
+                $studentsfees = DB::connection('sqlite')->select('SELECT * FROM students_fees WHERE student_id = '.$student->id.';');
+
+                foreach($studentsfees as $studentsfee){
+                    $stdfee = new StudentsFee;
+                    $stdfee->student_id = $std->id;
+                    $stdfee->semester_id = $studentsfee->semester_id;
+                    $stdfee->bank_id = $studentsfee->bank_id;
+                    $stdfee->challan_no = $studentsfee->challan_no;
+                    $stdfee->date_of_deposit = $studentsfee->date_of_deposit;
+                    $stdfee->total_amount = $studentsfee->total_amount;
+                    $stdfee->save();
+
+                    $studentsfeesselections = DB::connection('sqlite')->select('SELECT * FROM students_fees_selections WHERE students_fees_id = '.$studentsfee->id.';');
+
+                    foreach($studentsfeesselections as $studentsfeesselection) {
+                        $stdfeeselection = new StudentsFeesSelection;
+                        $stdfeeselection->students_fees_id = $stdfee->id;
+                        $stdfeeselection->student_id = $std->id;
+                        $stdfeeselection->semester_id = $studentsfeesselection->semester_id;
+                        $stdfeeselection->fee_id = $studentsfeesselection->fee_id;
+                        $stdfeeselection->save();
+                    }
+                }
+
 			} /// end of foreach
     		
 

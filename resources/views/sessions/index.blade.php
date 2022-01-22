@@ -50,6 +50,7 @@
 	                    <th>Session Title</th>
 	                    <th>Year</th>
 	                    <th>Expiry Date</th>
+	                    <th>Active</th>
 	                    <th>Created At</th>
 	                    <th>Updated At</th>
 	                    <th>Action</th>
@@ -222,6 +223,10 @@
               {
                 data: 'expiry_date',
                 name: 'expiry_date'
+              },
+              {
+                data: 'is_active',
+                name: 'is_active'
               },
               {
                 data: 'created_at',
