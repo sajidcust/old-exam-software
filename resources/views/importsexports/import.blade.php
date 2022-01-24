@@ -77,7 +77,22 @@
 
                     <?php $stds = App\Models\Student::all(); ?>
 
-                    <h4 class="custom-pull-right">Total Records: <span id="total_records">{{ count($stds) }}</span></h4>
+                    <?php 
+
+                      Config::set("database.connections.sqlite", [
+                          "driver" => "sqlite",
+                          "url" => '',
+                          "database" => database_path('db_imports\database.sqlite'),
+                          "prefix" => '',
+                          'foreign_key_constraints' => ''
+                      ]);
+
+                    ?>
+
+                    <?php $stds_external = DB::connection('sqlite')->select("SELECT * FROM students;"); ?>
+
+                    <p class="custom-pull-right">Total Records Internal: <span id="total_records">{{ count($stds) }}</span></p>
+                    <p class="custom-pull-right">Total Records External: <span id="total_records">{{ count($stds_external) }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                   </div>
                 </form>
             </div>
@@ -145,7 +160,24 @@
                   <div class="card-footer">
                     <input id="submitBtn2" type="submit" class="btn btn-success" value="Import">
 
-                    <h4 class="custom-pull-right">Total Records Added: <span id="total_records">0</span></h4>
+                    <?php $stds_exams = App\Models\StudentsExam::all(); ?>
+
+                    <?php 
+
+                      Config::set("database.connections.sqlite", [
+                          "driver" => "sqlite",
+                          "url" => '',
+                          "database" => database_path('db_imports\database.sqlite'),
+                          "prefix" => '',
+                          'foreign_key_constraints' => ''
+                      ]);
+
+                    ?>
+
+                    <?php $stds_exams_external = DB::connection('sqlite')->select("SELECT * FROM students_exams;"); ?>
+
+                    <p class="custom-pull-right">Total Records Internal: <span id="total_records">{{ count($stds_exams) }}</span></p>
+                    <p class="custom-pull-right">Total Records External: <span id="total_records">{{ count($stds_exams_external) }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                   </div>
                 </form>
             </div>

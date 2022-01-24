@@ -23,7 +23,7 @@ class CreateStudentsTable extends Migration
             $table->text('home_address')->nullable();
             $table->string('cell_no')->nullable();
             $table->string('email')->nullable();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->boolean('student_type');
             $table->unsignedBigInteger('class_id');
             $table->foreign('class_id')->references('id')->on('standards');

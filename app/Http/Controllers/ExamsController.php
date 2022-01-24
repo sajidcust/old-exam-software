@@ -224,7 +224,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -292,7 +292,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -359,7 +359,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -426,7 +426,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -493,7 +493,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -560,7 +560,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -626,7 +626,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -791,7 +791,7 @@ class ExamsController extends Controller
         $class_id = $request->input('class_id');
 
         if($session_id && $class_id){
-            $students = DB::select(DB::raw("
+            /*$students = DB::select(DB::raw("
                         SELECT
                             d.id AS district_id,
                             d.name AS district_name,
@@ -820,6 +820,35 @@ class ExamsController extends Controller
                             AND s.class_id = ". $class_id ."
                             GROUP BY s.id
                             ORDER BY i.id;
+                    "));*/
+
+            $students = DB::select(DB::raw("
+                        SELECT
+                            d.id AS district_id,
+                            d.name AS district_name,
+                            t.id AS tehsil_id,
+                            t.name AS tehsil_name,
+                            s.center_id,
+                            s.institution_id,
+                            i.name AS center_name,
+                            s.name AS student_name,
+                            s.father_name,
+                            s.class_id,
+                            std.name AS class_name,
+                            s.id AS roll_no
+                            FROM students AS s
+                            JOIN institutions AS i
+                            ON s.center_id = i.id
+                            JOIN tehsils AS t
+                            ON i.tehsil_id = t.id
+                            JOIN districts AS d
+                            ON t.district_id = d.id
+                            JOIN standards AS std
+                            ON s.class_id = std.id
+                            WHERE s.session_id = ". $session_id ."
+                            AND s.class_id = ". $class_id ."
+                            GROUP BY s.id
+                            ORDER BY i.id;
                     "));
 
             $standard = Standard::find($class_id);
@@ -827,12 +856,13 @@ class ExamsController extends Controller
 
             $students_counter = count($students);
 
-            if($students_counter == 0 ) {
+            /*if($students_counter == 0 ) {
                 $stdnts = Student::where('session_id', $session_id)->where('class_id', $class_id)->get(['id', 'name']);
 
                 if(count($stdnts)>0){
                     foreach($stdnts as $stdnt){
                         foreach($semesters as $semester){
+
                             $exception = '['.date('d-M-Y H:i:s A'). '] - Student with Roll No: ['. $stdnt->id. '] and Name: ['. $stdnt->name . '] For Semester:['. $semester->title .'] Error Code: [GZT-001] Error Message:[Failed to add the record to the gazette because result of some subjects are missing for the student.]';
                         
                             $fj = new FailedJob;
@@ -840,14 +870,14 @@ class ExamsController extends Controller
                             $fj->uuid = Str::uuid()->toString();
                             $fj->connection = DB::connection()->getDriverName();
                             $fj->queue = 'GZT';
-                            $fj->payload = 'GZT-'.$stdnt->id.'-'.$semester->id;;
+                            $fj->payload = 'GZT-'.$stdnt->id.'-'.$semester->id;
                             $fj->exception = $exception;
                             $fj->failed_at = date('Y-m-d h:i:s');
                             $fj->save();
                         }
                     }
                 }
-            }
+            }*/
 
             Gazette::where('session_id', $session_id)->where('class_id', $class_id)->delete();
             TableOfContent::where('session_id', $session_id)->where('class_id', $class_id)->delete();
@@ -857,6 +887,8 @@ class ExamsController extends Controller
                 $all_subs_added = true;
 
                 foreach($semesters as $semester) {
+                    FailedJob::where('payload', 'GZT-'.$student->roll_no.'-'.$semester_id)->delete();
+
                     $se_count = StudentsExam::where('student_id', $student->roll_no)->where('semester_id', $semester->id)->count();
 
                     if($se_count < $standard->min_subjects){
@@ -866,7 +898,6 @@ class ExamsController extends Controller
                         
                         $fj = new FailedJob;
                         $fj->timestamps = false;
-                        $fj->uuid = date('dmYhis').''.$student->roll_no.''.$semester->id;
                         $fj->uuid = Str::uuid()->toString();
                         $fj->connection = DB::connection()->getDriverName();
                         $fj->queue = 'GZT';
@@ -1612,7 +1643,7 @@ class ExamsController extends Controller
                             s.home_address,
                             s.cell_no,
                             s.email,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             (
@@ -1691,7 +1722,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             s.gender,
                             s.student_type as status,
                             ".$date_of_birth."
@@ -1754,7 +1785,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             s.gender,
                             s.student_type as status,
                             ".$date_of_birth."
@@ -1834,7 +1865,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             s.gender,
                             s.student_type as status,
                             ".$date_of_birth."
@@ -1901,7 +1932,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             s.gender,
                             s.student_type as status,
                             ".$date_of_birth."
@@ -1980,7 +2011,7 @@ class ExamsController extends Controller
                             s.home_address,
                             s.cell_no,
                             s.email,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             (CASE  WHEN s.student_type=0 THEN 'Regular' ELSE 'Private' END) AS student_type,
                             ss.title,
                             (
@@ -2082,7 +2113,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions
@@ -2147,7 +2178,7 @@ class ExamsController extends Controller
                             s.id,
                             s.name,
                             s.father_name,
-                            s.image,
+                            (CASE WHEN s.image IS NULL THEN '' ELSE s.image END) AS image,
                             ss.title as session_title,
                             (
                                 SELECT institutions.name FROM institutions

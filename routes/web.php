@@ -70,6 +70,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/sessions/destroy', [SessionsController::class, 'destroy'])->name('sessions.destroy');
 	Route::get('/sessions/edit/{id}', [SessionsController::class, 'edit']);
 	Route::post('/sessions/update', [SessionsController::class, 'update'])->name('sessions.update');
+	Route::post('/sessions/activesessions', [SessionsController::class, 'activesessions'])->name('sessions.activesessions');
 
 	Route::get('/institutions', [InstitutionsController::class, 'index']);
 	Route::get('/institutions/index', [InstitutionsController::class, 'index'])->name('institutions.index');

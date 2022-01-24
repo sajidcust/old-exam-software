@@ -18,6 +18,7 @@ class CreateSessionsTable extends Migration
             $table->string('title');
             $table->integer('year');
             $table->date('expiry_date')->default(date("2021-12-12"));
+            $tale->boolean('is_active')->default(0);
             $table->timestamps();
         });
     }

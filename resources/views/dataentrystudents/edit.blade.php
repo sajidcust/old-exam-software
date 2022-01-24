@@ -115,8 +115,8 @@
                           <option value="0" {{ Request::old('gender') == 0 ? 'selected':'' }}>MALE</option>
                           <option value="1" {{ Request::old('gender') == 1 ? 'selected':'' }}>FEMALE</option>
                       @else
-                        <option value="0" {{ auth()->user()->gender == 0 ? 'selected':'' }}>MALE</option>
-                          <option value="1" {{ auth()->user()->gender == 1 ? 'selected':'' }}>FEMALE</option>
+                        <option value="0" {{ $student->gender == 0 ? 'selected':'' }}>MALE</option>
+                          <option value="1" {{ $student->gender == 1 ? 'selected':'' }}>FEMALE</option>
                       @endif
                       </select>
                    </div>

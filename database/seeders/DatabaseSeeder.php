@@ -46,14 +46,14 @@ class DatabaseSeeder extends Seeder
         $user2 = new User;
         $user2->name = 'User';
         $user2->email = 'assesmentcenter@beeg.gov.pk';
-        $user2->password = Hash::make('password123');
+        $user2->password = md5('password123');
         $user2->user_role = 2;
         $user2->save();
 
         $user1 = new User;
         $user1->name = 'User';
         $user1->email = 'dataentry@beeg.gov.pk';
-        $user1->password = Hash::make('password123');
+        $user1->password = md5('password123');
         $user1->user_role = 3;
         $user1->save();
 
