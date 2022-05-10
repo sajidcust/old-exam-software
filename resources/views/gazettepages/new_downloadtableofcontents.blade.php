@@ -5,6 +5,10 @@
 <title>Gazette Table Of Contents Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }

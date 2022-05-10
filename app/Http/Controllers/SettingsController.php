@@ -80,18 +80,30 @@ class SettingsController extends Controller
                 }
                 $setting->controllers_message = $request->input('controllers_message');
 
+                if($request->file('controller_signature')!='') {
+                    $originalImage4= $request->file('controller_signature');
+                    $thumbnailImage4 = Image::make($originalImage4);
+
+                    $web_path_orig4 = '/images/'.time().'-orig-controller-signature.'.$originalImage4->getClientOriginalExtension();
+
+                    $orig_add4 = public_path().$web_path_orig4;
+                    $thumbnailImage4->save($orig_add4);
+
+                    $setting->controller_signature=$web_path_orig4;
+                }
+
                 $setting->deputy_controller_name = $request->input('deputy_controller_name');
 
                 if($request->file('deputy_controller_signature')!='') {
-                    $originalImage4= $request->file('deputy_controller_signature');
-                    $thumbnailImage4 = Image::make($originalImage4);
+                    $originalImage5= $request->file('deputy_controller_signature');
+                    $thumbnailImage5 = Image::make($originalImage5);
 
-                    $web_path_orig4 = '/images/'.time().'-orig-deputy-controller-signature.'.$originalImage4->getClientOriginalExtension();
+                    $web_path_orig5 = '/images/'.time().'-orig-deputy-controller-signature.'.$originalImage5->getClientOriginalExtension();
 
-                    $orig_add3 = public_path().$web_path_orig4;
-                    $thumbnailImage4->save($orig_add3);
+                    $orig_add5 = public_path().$web_path_orig5;
+                    $thumbnailImage5->save($orig_add5);
 
-                    $setting->deputy_controller_signature=$web_path_orig4;
+                    $setting->deputy_controller_signature=$web_path_orig5;
                 }
 
                 $setting->save();

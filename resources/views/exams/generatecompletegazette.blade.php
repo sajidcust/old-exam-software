@@ -201,6 +201,46 @@
               </form>
 
               <div class="card-header">
+                <h3 class="card-title"><strong>Print Districtwise Top 10 Position Holders</strong></h3>
+              </div>
+
+              <form id="quickForm_district_top_10_position_holders" method="post" action="{{ route('exams.districtwisetop10positionholders') }}">
+                {{ csrf_field() }}
+                <input type="hidden" name="session_id" value="{{ $session_id }}">
+                <input type="hidden" name="class_id" value="{{ $class_id }}">
+
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="labelInputPageNo">Previous Page No<i class="fa fa-star-of-life required-label"></i></i></label>
+                        <input type="number" name="page_no" class="form-control" id="labelInputPageNo" placeholder="Enter page no" value="">
+                       </div>
+                      </div>
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <label for="labelInputDisrtict">District<i class="fa fa-star-of-life required-label"></i></label>
+                          <select class="custom-select rounded-0 select2" id="labelInputDisrtict" name="district_id">
+                              <option value="">Select a district</option> 
+                              @foreach($districts as $district)
+                                @if($district->id == Request::old('district_id'))
+                                    <option selected value="{{ $district->id }}">{{ $district->name }}</option>
+                                @else
+                                    <option value="{{ $district->id }}">{{ $district->name }}</option>
+                                @endif
+                              @endforeach
+                          </select>
+                       </div>
+                      </div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                  <input id="submitBtn" type="submit" class="btn btn-success" value="Download">
+                </div>
+              </form>
+
+              <div class="card-header">
                 <h3 class="card-title"><strong>Print Pie Graph Overall Result Summary</strong></h3>
               </div>
               <!-- form start -->
@@ -359,6 +399,7 @@
                   <?php 
                     foreach($districts as $district) { 
                       $result_bar_graph_subjects_and_districts = App\Models\StudentsExam::getTotalPassFailStudentsBySubjectsAndDistricts($session_id, $class_id, $district->id);
+                      //dd($result_bar_graph_subjects_and_districts);
                   ?>
 
                       var json_data = <?php echo $result_bar_graph_subjects_and_districts['percentages_arr']; ?>;
@@ -614,6 +655,35 @@
   }, "Enter a value greater than 0.");
 
   var validatevar = $('#quickForm_print_complete_gazette').validate({
+      rules: {
+        page_no: {
+          required: true,
+          number: true,
+          minStrict:true
+        },
+        district_id: {
+          required: true
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+        $(element).removeClass('is-valid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+        $(element).addClass('is-valid');
+      },
+      submitHandler: function(form) {
+        form.submit();
+      }
+   });
+
+  var validatevar = $('#quickForm_district_top_10_position_holders').validate({
       rules: {
         page_no: {
           required: true,

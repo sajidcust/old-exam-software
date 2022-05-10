@@ -63,6 +63,15 @@
                       </div>
                     </div>
                     <div class="form-group">
+                      <label>Result Declaration Date<i class="fa fa-star-of-life required-label"></i></label>
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                        <input id="datemask" type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask="" inputmode="numeric" name="result_declaration_date" value="{{ Request::old('result_declaration_date') != '' ? Request::old('result_declaration_date') : date('d-m-Y', strtotime($session->result_declaration_date)) }}">
+                      </div>
+                    </div>
+                    <div class="form-group">
                       <label for="labelInputIsActive">Is Active<i class="fa fa-star-of-life required-label"></i></label>
                       <select class="custom-select rounded-0" id="labelInputIsActive" name="is_active">
                       @if(Request::old('is_active') != '')

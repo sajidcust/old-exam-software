@@ -5,6 +5,10 @@
 <title>Gazette Secretary Message Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -70,7 +74,7 @@
                 //$pageText = "Page " . $plused_page . " of " . $PAGE_COUNT;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');

@@ -5,6 +5,10 @@
 <title>Gazette Preamble Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+  body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -70,7 +74,7 @@
                 //$pageText = "Page " . $plused_page . " of " . $PAGE_COUNT;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');
@@ -84,7 +88,7 @@
 </tr>
 <tr style="height: 18px;">
 <td style="width: 100%; height: 18px; border-style: none; text-align: center;">
-<p style="text-align: left;">&nbsp; &nbsp; The {{ $setting->board_full_name }} conducted the Annual Examination Class <span style="text-decoration: underline;"><strong>{{ $standard->name }}</strong></span> for <span style="text-decoration: underline;"><strong>{{ $session->title }}</strong></span> from 
+<p style="text-align: left;">&nbsp; &nbsp; The {{ $setting->board_full_name }} conducted the Annual Examination of Class <span style="text-decoration: underline;"><strong>{{ $standard->name }}</strong></span> for <span style="text-decoration: underline;"><strong>{{ $session->title }}</strong></span> from 
 
 <?php
   $semesters = App\Models\Semester::where('session_id', $session->id)->get();
@@ -104,9 +108,9 @@
   }
 ?>
 </p>
-<p style="text-align: left;">&nbsp; &nbsp; &nbsp;The total numbers of students in class <span style="text-decoration: underline;"><strong>{{ $standard->name }}</strong></span> were <span style="text-decoration: underline;"><strong>{{ $result->total_students }}</strong></span>, out of which <span style="text-decoration: underline;"><strong>{{ $result->pass_students }}</strong></span> were declared <strong>Pass</strong> whereas <span style="text-decoration: underline;"><strong>{{ $result->promoted_students }}</strong></span> were declared as <strong>Promoted</strong> and <span style="text-decoration: underline;"><strong>{{ $result->reappear_students }}</strong></span> were considered as <strong>Reappear</strong> and the pass percentage is <span style="text-decoration: underline;"><strong>{{ round(((($result->pass_students+$result->promoted_students)/$result->total_students)*100), 2) }}%</strong></span>.</p>
+<p style="text-align: left;">&nbsp; &nbsp; &nbsp;The total number of students in class <span style="text-decoration: underline;"><strong>{{ $standard->name }}</strong></span> were <span style="text-decoration: underline;"><strong>{{ $result->total_students }}</strong></span>, out of which <span style="text-decoration: underline;"><strong>{{ $result->pass_students }}</strong></span> were declared <strong>Pass</strong> whereas <span style="text-decoration: underline;"><strong>{{ $result->promoted_students }}</strong></span> were declared as <strong>Promoted</strong> and <span style="text-decoration: underline;"><strong>{{ $result->reappear_students }}</strong></span> were considered as <strong>Reappear</strong> and the pass percentage is <span style="text-decoration: underline;"><strong>{{ round(((($result->pass_students+$result->promoted_students)/$result->total_students)*100), 2) }}%</strong></span>.</p>
 
-<p style="text-align: left;">&nbsp; &nbsp; &nbsp; The table below shows a complete representation of result details of Class {{ $standard->name }}:-
+<p style="text-align: left;">&nbsp; &nbsp; &nbsp; The table below shows a complete representation of result detail of Class {{ $standard->name }}:-
   <table style="border-collapse: collapse; width: 100%;margin-bottom:5px;" border="1">
       <tbody>
       <tr>
@@ -180,13 +184,12 @@
 </table>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
-<p>&nbsp;</p>
 <table style="width: 100%; border-collapse: collapse; border-style: none;" border="1">
 <tbody>
 <tr>
 <td style="width: 20%; border-style: none; text-align: center;"><strong>({{ $setting->deputy_controller_name }})</strong><br />Deputy Controller<br />{{ $setting->board_full_name }}</td>
 <td style="width: 60%; border-style: none;">&nbsp;</td>
-<td style="width: 20%; border-style: none; text-align: center;"><strong>({{ $setting->controller_name }})</strong><br />Controller BEEG/Director<br />Education (Academics)<br />Gilgit Baltistan</td>
+<td style="width: 20%; border-style: none; text-align: center;"><strong>({{ $setting->controller_name }})</strong><br />Controller BEEG/Director<br />Education (Academics)<br />Gilgit Division</td>
 </tr>
 </tbody>
 </table>

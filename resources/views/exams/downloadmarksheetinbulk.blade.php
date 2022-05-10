@@ -6,15 +6,6 @@
 
 <style type="text/css">
 
-    body{
-      margin:-50px;padding:-50px;
-      background-image: url("img/green_background_small.png");
-      background-size: 15%;
-      background-repeat: repeat;
-      z-index: -1;
-      opacity: 0.3;
-    }
-
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -89,22 +80,11 @@
       @if($counter != 1)
         <div class="page_break"></div>
       @endif
-
-      <div style="padding:25px;margin:25px;background-image: url('img/w.png'); background-repeat: no-repeat; background-position: center;opacity: 0.4;">
-        <table style="height: 36px; width: 100%; border-collapse: collapse; border-style: none;" border="1">
-      <tbody>
-      <tr style="height: 18px;">
-      <td style="width: 100%; height: 18px; border-style: none; text-align: center;"><span style="text-decoration: underline;"><img src="img/beeg_certificate.png" width="450" /></span></td>
-      </tr>
-      </tbody>
-      </table>
+      <div style="height:160px;" ></div>
       <table style="height: 36px; width: 100%; border-collapse: collapse; border-style: none;" border="1">
       <tbody>
       <tr style="height: 18px;">
-      <td style="width: 100%; height: 18px; border-style: none; text-align: center;"><strong><span style="text-decoration: underline;">DETAIL MARKS CERTIFICATE</span></strong></td>
-      </tr>
-      <tr style="height: 18px;">
-      <td style="width: 100%; height: 18px; border-style: none; text-align: center;"><span style="text-decoration: underline;">ELEMENTARY SCHOOL CERTIFICATE ANNUAL EXAMINATION {{ strtoupper($student->session_title) }}</span></td>
+      <td style="width: 100%; height: 18px; border-style: none; text-align: center;"><span style="text-decoration: underline;font-weight: bold;">ELEMENTARY SCHOOL CERTIFICATE ANNUAL EXAMINATION {{ strtoupper($student->session_title) }}</span></td>
       </tr>
       </tbody>
       </table>
@@ -119,7 +99,7 @@
         <td style="font-size: 15px; width: 2.98243%; text-align: right; height: 10px;">&nbsp;</td>
         <td style="font-size: 15px; width: 23.6042%; text-align: right; height: 10px;">Class:</td>
         <td style="font-size: 15px; width: 15.8565%; text-align: left; padding-left:10px; height: 10px;">
-          <span style="text-decoration: underline;"><strong>{{ $student->class_name }}</strong></span></td>
+          <span style="text-decoration: underline;"><strong>{{ strtoupper($student->class_name) }}</strong></span></td>
         <td style="height: 30px; width: 18.711%;" rowspan="3">
           @if($student->image != '')
           <?php $image = ltrim($student->image, $student->image[0]); ?>
@@ -150,25 +130,25 @@
         <tr style="height: 10px;">
         <td style="font-size: 13px; width: 1.63682%; text-align: right; height: 10px;">&nbsp;</td>
         <td style="font-size: 13px; width: 102.334%; text-align: left; height: 10px;" colspan="6">
-          <span style="display: inline-block; width: 42%; border-bottom: 1px solid #000; font-weight: bold;">{{ $student->name }}</span> 
+          <span style="display: inline-block; width: 42%; border-bottom: 1px solid #000; font-weight: bold;">{{ strtoupper($student->name) }}</span> 
           <span style="width: 15%; display: inline-block; text-align: center;"> {{ $student->gender == 0 ? " Son of " : " Daughter of " }} </span> 
-          <span style="display: inline-block; width: 43%; border-bottom: 1px solid #000; font-weight: bold;">{{ $student->father_name }}</span></td>
+          <span style="display: inline-block; width: 43%; border-bottom: 1px solid #000; font-weight: bold;">{{ strtoupper($student->father_name) }}</span></td>
         <td style="width: 3.56315%; height: 10px;">&nbsp;</td>
         </tr>
         <tr style="height: 10px;">
         <td style="font-size: 13px; width: 1.63682%; text-align: right; height: 10px;">&nbsp;</td>
         <td style="font-size: 13px; width: 102.334%; text-align: left; height: 10px;" colspan="6">
           of Institution <span style="display: inline-block; width: 88%; border-bottom: 1px solid #000; text-align: center; font-weight: bold;">
-           {{ $student->institution_name }}</span></td>
+           {{ strtoupper($student->institution_name) }}</span></td>
         <td style="width: 3.56315%; height: 10px;">&nbsp;</td>
         </tr>
         <?php $month_of_exams = App\Models\StudentsExam::getMonthOfExams($student->session_id, $student->class_id, $student->id, $student->year); ?>
         <tr style="height: 10px;">
         <td style="font-size: 13px; width: 1.63682%; text-align: right; height: 10px;">&nbsp;</td>
         <td style="font-size: 13px; width: 102.334%; text-align: left; height: 10px;" colspan="6">Status 
-          <span style="display: inline-block; width: 7%; border-bottom: 1px solid #000; font-weight: bold;">{{ $student->status == 0 ? "Regular":"Private" }}</span> 
+          <span style="display: inline-block; width: 10%; border-bottom: 1px solid #000; font-weight: bold;">{{ $student->status == 0 ? "REGULAR":"PRIVATE" }}</span> 
           has secured the marks shown against each subject in the Elementary School Certificate Annual Examination held in the month of 
-          <span style="display: inline-block; width: 100px; border-bottom: 1px solid #000; font-weight: bold; text-align: center;">{{ $month_of_exams }}</span></td>
+          <span style="display: inline-block; width: 100px; border-bottom: 1px solid #000; font-weight: bold; text-align: center;">{{ strtoupper($month_of_exams) }}</span></td>
         <td style="width: 3.56315%; height: 10px;">&nbsp;</td>
         </tr>
         </tbody>
@@ -310,7 +290,7 @@
         <td style="padding-left: 10px; font-size: 13px; width: 69.1909%;">
           <span style="display: inline-block; width: 100%; border-bottom: 1px solid #000; text-align: left; font-weight: bold;">
             <?php $see = new  App\Models\StudentsExam; ?>
-           {{ $see->convert_number($total_obt_marks) }}
+           {{ strtoupper($see->convert_number($total_obt_marks)) }}
          </span></td>
         </tr>
         <tr>
@@ -336,13 +316,34 @@
         <td style="font-size: 13px; width: 30.8091%; text-align: right;">(In Words):</td>
         <td style="padding-left: 10px; font-size: 13px; width: 69.1909%;">
           <span style="display: inline-block; width: 100%; border-bottom: 1px solid #000; text-align: left; font-weight: bold;">
-           {{ $student->dob_in_words }}</span></td>
+           {{ strtoupper($student->dob_in_words) }}</span></td>
         </tr>
         </tbody>
         </table>
         <p>&nbsp;</p>
-        <table style="width: 100%; border-collapse: collapse; border-style: none;" border="1">
+        <table style="width: 100%; border-collapse: collapse; border-style: none;" border="0">
         <tbody>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td style="text-align:center;">
+            @if($student->class_id == 1001)
+              @if($setting->deputy_controller_signature != '')
+                <?php $dcsi = ltrim($setting->deputy_controller_signature, $setting->deputy_controller_signature[0]); ?>
+                <img style="margin-top:-10px;margin-left: 30px;position: absolute;" src="{{ $dcsi }}" alt="" width="60"/>
+              @else
+                <img style="margin-top:-10px;margin-left: 30px;position: absolute;" src="img/controller_signature.jpg" alt="" width="60"/>
+              @endif
+            @else
+              @if($setting->controller_signature != '')
+                <?php $dcsi = ltrim($setting->controller_signature, $setting->controller_signature[0]); ?>
+                <img style="margin-top:0px;margin-left: 30px;position: absolute;" src="{{ $dcsi }}" alt="" width="60"/>
+              @else
+                <img style="margin-top:0px;margin-left: 30px;position: absolute;" src="img/controller_signature.jpg" alt="" width="60"/>
+              @endif
+            @endif
+          </td>
+        </tr>
         <tr>
         <td style="font-size: 11px; width: 5.43276%; border-style: none;">&nbsp;</td>
         <td style="font-size: 11px; width: 75.4234%; border-style: none;">Prepared by:_________________________</td>
@@ -350,12 +351,11 @@
         </tr>
         <tr>
         <td style="font-size: 11px; width: 5.43276%; border-style: none;">&nbsp;</td>
-        <td style="font-size: 11px; width: 75.4234%; border-style: none;">Result Declaration Date:&nbsp; <strong>{{ date('d F, Y') }}</strong></td>
-        <td style="font-size: 11px; width: 19.1438%; font-weight: bold; border-style: none; text-align: center;">Deputy Controller Of Examinations</td>
+        <td style="font-size: 11px; width: 75.4234%; border-style: none;">Result Declaration Date:&nbsp; <strong>{{ date('d F, Y', strtotime($session->result_declaration_date)) }}</strong></td>
+        <td style="font-size: 11px; width: 19.1438%; font-weight: bold; border-style: none; text-align: center;">{{ $student->class_id == 1001 ? 'Deputy ': '' }}Controller Of Examinations</td>
         </tr>
         </tbody>
         </table>
-      </div>
 
       
   <?php $counter++; ?>

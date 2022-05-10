@@ -289,7 +289,9 @@ class MarksController extends Controller
         $center_id = $request->input('center_id');
         $subject_id = $request->input('subject_id');
 
-        $students = Student::where('session_id', $session_id)->where('class_id', $class_id)->where('center_id', $center_id)->get(['id', 'name']);
+        //$students = Student::where('session_id', $session_id)->where('class_id', $class_id)->where('center_id', $center_id)->get(['id', 'name']);
+
+        $students = Student::join('students_subjects', 'students_subjects.student_id', '=', 'students.id')->where('students_subjects.subject_id', $subject_id)->where('session_id', $session_id)->where('class_id', $class_id)->where('center_id', $center_id)->get(['students.id', 'students.name']);
 
         $subject = Subject::find($subject_id);
         $semester = Semester::find($semester_id);

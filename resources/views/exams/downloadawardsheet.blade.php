@@ -117,10 +117,10 @@
               <th>Roll No</th>
               <th>Name</th>
               <th>Father Name</th>
-              <th>Sheet No</th>
+              <th>Sheet No </th>
               <th>Sign</th>
-              <th>Prc</th>
-              <th>Thr</th>
+              <th>Theo</th>
+              <th>Hom Exm</th>
               <th>T. Marks</th>
             </tr>
           </thead>

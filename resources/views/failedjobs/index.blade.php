@@ -51,6 +51,9 @@
 	                    <th>Error</th>
 	                    <th>Queue</th>
 	                    <th>Failed At</th>
+	                    <th>Center Details</th>
+	                    <th>Student Details</th>
+	                    <th>Update Marks</th>
 	                    <th>Action</th>
 	                  </tr>
 	                  </thead>
@@ -294,11 +297,36 @@
                 name: 'failed_at'
               },
               {
+                data: 'centerdets',
+                name: 'centerdets'
+              },
+              {
+                data: 'stdlink',
+                name: 'stdlink'
+              },
+              {
+                data: 'links',
+                name: 'links'
+              },
+              {
                 data: 'action',
                 name: 'action',
                 orderable:false
               }
-            ]
+            ],
+            "columnDefs": [
+	            {
+	                // The `data` parameter refers to the data for the cell (defined by the
+	                // `data` option, which defaults to the column being worked with, in
+	                // this case `data: 0`.
+	                "render": function ( data, type, row ) {
+	                    //return htmlDecode(data);
+	                    var doc = new DOMParser().parseFromString(data, "text/html");
+							return doc.documentElement.textContent;
+	                },
+	                "targets": [5, 6, 7]
+	            }
+	        ],
         });
     });
 

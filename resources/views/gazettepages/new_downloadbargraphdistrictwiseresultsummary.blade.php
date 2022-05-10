@@ -5,6 +5,10 @@
 <title>Gazette Bar Graph District Wise Result Summary Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -70,7 +74,7 @@
                 //$pageText = "Page " . $plused_page . " of " . $PAGE_COUNT;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');
@@ -83,7 +87,7 @@
 <td style="width: 20%; border-style: none; text-align: center;"><img src="img/g.png" alt="" width="100" /></td>
 <td style="width: 60%; border-style: none;">
 <h1 style="text-align: center;">{{ strtoupper($setting->board_full_name) }}</h1>
-<h3 style="text-align: center;">DISTRICT WISE RESULT SUMMARY GRAPHICAL VIEW</h3>
+<h3 style="text-align: center;">DISTRICT WISE RESULT SUMMARY GRAPHICAL VIEW OF CLASS {{ strtoupper($standard->name) }}</h3>
 </td>
 <td style="width: 20%; border-style: none; text-align: center;"><img src="img/w.png" alt="" width="100" /></td>
 </tr>
@@ -136,7 +140,7 @@
 </table>
 
 </td>
-<td style="width: 70%; border-style: none;"><img src="{{ $image_address }}" alt="" width="1000" height="500" /></td>
+<td style="width: 70%; border-style: none;"><img src="{{ $image_address }}" alt="" width="700" height="370" /></td>
 </tr>
 </tbody>
 </table>

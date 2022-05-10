@@ -28,15 +28,17 @@ class SessionsController extends Controller
 
         if(DB::connection()->getDriverName() == 'mysql') {
             $expiry_date = "DATE_FORMAT(sessions.expiry_date, '%d-%m-%Y') AS expiry_date";
+            $result_declaration_date = "DATE_FORMAT(sessions.result_declaration_date, '%d-%m-%Y') AS result_declaration_date";
         }
 
         if(DB::connection()->getDriverName() == 'sqlite') {
             $expiry_date = "strftime('%d-%m-%Y', sessions.expiry_date) AS expiry_date";
+            $result_declaration_date = "strftime('%d-%m-%Y', sessions.result_declaration_date) AS result_declaration_date";
         }
 
         if(request()->ajax())
         {
-            return datatables()->of(Session::select('sessions.id', 'sessions.title', 'sessions.year', DB::raw($expiry_date), DB::raw("(CASE  WHEN sessions.is_active=0 THEN 'NO' ELSE 'YES' END) AS is_active"), 'sessions.created_at', 'sessions.updated_at')->get())
+            return datatables()->of(Session::select('sessions.id', 'sessions.title', 'sessions.year', DB::raw($expiry_date), DB::raw($result_declaration_date), DB::raw("(CASE  WHEN sessions.is_active=0 THEN 'NO' ELSE 'YES' END) AS is_active"), 'sessions.created_at', 'sessions.updated_at')->get())
                     ->addColumn('action', function($data){
                         $button = '<a href="'.url('admin/sessions/edit/'.$data->id).'" name="edit" id="'.$data->id.'" class="btn btn-success margin-2px btn-sm"><span class="fa fa-edit"></span></a>';
                         $button .='&nbsp;&nbsp;';
@@ -97,6 +99,7 @@ class SessionsController extends Controller
             $session->title = $request->input('title');
             $session->year = $request->input('year');
             $session->expiry_date = date('Y-m-d', strtotime($request->input('expiry_date')));
+            $session->result_declaration_date = date('Y-m-d', strtotime($request->input('result_declaration_date')));
             $session->is_active = $request->input('is_active');
             $session->save();
 
@@ -163,6 +166,7 @@ class SessionsController extends Controller
                 $session->title = $request->input('title');
                 $session->year = $request->input('year');
                 $session->expiry_date = date('Y-m-d', strtotime($request->input('expiry_date')));
+                $session->result_declaration_date = date('Y-m-d', strtotime($request->input('result_declaration_date')));
                 $session->is_active = $request->input('is_active');
                 $session->save();
 

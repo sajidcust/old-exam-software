@@ -420,29 +420,50 @@ class StudentsExam extends Model
                         SELECT COUNT(*) FROM students_exams 
                         JOIN students
                         ON students_exams.student_id = students.id
+                        INNER JOIN institutions
+                        ON students.institution_id = institutions.id
+                        INNER JOIN tehsils 
+                        ON institutions.tehsil_id = tehsils.id
+                        INNER JOIN districts
+                        ON tehsils.district_id = districts.id
                         WHERE students_exams.subject_id = s.id 
                         AND students.session_id = g.session_id
                         AND students.class_id = g.class_id
+                        AND districts.id = g.district_id
                         GROUP BY students_exams.subject_id
                     ) as total_students_appeared,
                     (
                         SELECT COUNT(*) FROM students_exams 
                         JOIN students
                         ON students_exams.student_id = students.id
+                        INNER JOIN institutions
+                        ON students.institution_id = institutions.id
+                        INNER JOIN tehsils 
+                        ON institutions.tehsil_id = tehsils.id
+                        INNER JOIN districts
+                        ON tehsils.district_id = districts.id
                         WHERE ((students_exams.total_obt_marks/students_exams.total_max_marks)*100) >= 33
                         AND students_exams.subject_id = s.id 
                         AND students.session_id = g.session_id
                         AND students.class_id = g.class_id
+                        AND districts.id = g.district_id
                         GROUP BY students_exams.subject_id
                     ) as pass_students,
                     (
                         SELECT COUNT(*) FROM students_exams 
                         JOIN students
                         ON students_exams.student_id = students.id
+                        INNER JOIN institutions
+                        ON students.institution_id = institutions.id
+                        INNER JOIN tehsils 
+                        ON institutions.tehsil_id = tehsils.id
+                        INNER JOIN districts
+                        ON tehsils.district_id = districts.id
                         WHERE ((students_exams.total_obt_marks/students_exams.total_max_marks)*100) < 33
                         AND students_exams.subject_id = s.id 
                         AND students.session_id = g.session_id
                         AND students.class_id = g.class_id
+                        AND districts.id = g.district_id
                         GROUP BY students_exams.subject_id
                     ) as fail_students
                     FROM gazettes g
@@ -519,6 +540,66 @@ class StudentsExam extends Model
         $count = 0;
         foreach($occurences as $occurence){
             if($counter != 4){    
+                for($j=0; $j<$occurence; $j++){
+                    $results_arr[$index][$j]['id'] = $results[$count+$j]->id;
+                    $results_arr[$index][$j]['name'] = $results[$count+$j]->name;
+                    $results_arr[$index][$j]['father_name'] = $results[$count+$j]->father_name;
+                    $results_arr[$index][$j]['center_code'] = $results[$count+$j]->center_code;
+                    $results_arr[$index][$j]['center_name'] = $results[$count+$j]->center_name;
+                    $results_arr[$index][$j]['class_name'] = $results[$count+$j]->class_name;
+                    $results_arr[$index][$j]['district_name'] = $results[$count+$j]->district_name;
+                    $results_arr[$index][$j]['total_obt_marks'] = $results[$count+$j]->total_obt_marks;
+                    $results_arr[$index][$j]['marks_percentage'] = $results[$count+$j]->marks_percentage;
+                    $results_arr[$index][$j]['result'] = $results[$count+$j]->result;
+                    $results_arr[$index][$j]['position'] = $counter;
+                }
+                $count = $count+$occurence;
+            } else {
+                break;
+            }
+            $counter++;
+            $index++;
+        }
+
+        return $results_arr;
+    }
+
+    public static function getToppersByDistrictPages($session_id, $class_id, $district_id){
+        $results = DB::select(DB::raw("
+                SELECT s.id, s.name, s.father_name, i.id AS center_code, i.name AS center_name, s.name AS class_name, d.name AS district_name, g.total_obt_marks, ROUND((g.total_obt_marks/g.total_max_marks)*100, 2) AS marks_percentage, g.result
+                    FROM students AS s
+                    JOIN gazettes AS g
+                    ON g.student_id = s.id
+                    JOIN institutions AS i
+                    ON i.id = s.center_id
+                    JOIN districts AS d
+                    ON d.id = g.district_id
+                    JOIN standards AS ss
+                    ON ss.id = g.class_id
+                    WHERE g.result = 0 
+                    AND g.district_id = :district_id
+                    AND g.session_id = :session_id 
+                    AND g.class_id = :standard_id
+                    ORDER BY g.total_obt_marks DESC;
+            "), array('session_id'=>$session_id, 'standard_id'=>$class_id, 'district_id'=>$district_id));
+
+        $results_arr = array();
+
+        $i = 1;
+        $index = 0;
+        $total_obt_marks_arr = array();
+        foreach($results as $result){
+            $total_obt_marks_arr[$index] = $result->total_obt_marks;
+            $index++;
+        }
+
+        $occurences = array_count_values($total_obt_marks_arr);
+
+        $counter = 1;
+        $index = 0;
+        $count = 0;
+        foreach($occurences as $occurence){
+            if($counter != 11){    
                 for($j=0; $j<$occurence; $j++){
                     $results_arr[$index][$j]['id'] = $results[$count+$j]->id;
                     $results_arr[$index][$j]['name'] = $results[$count+$j]->name;

@@ -5,6 +5,10 @@
 <title>Gazette Position Holders Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body {
+      margin-left: 4cm;
+      margin-right: 4cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -72,7 +76,7 @@
                 //$pageText = "Page " . $plused_page . " of " . $PAGE_COUNT;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');
@@ -98,7 +102,7 @@
 <tbody>
 <tr>
 <td style="width: 100%; border-style: none; text-align: center;">
-<h1><span style="text-decoration: underline;">Position Holders</span></h1>
+<h2><span style="text-decoration: underline;">Position Holders of Class {{ $standard->name }}</span></h2>
 </td>
 </tr>
 </tbody>
@@ -126,7 +130,12 @@
   @foreach($position_holders as $holders)
     @foreach($holders as $position)
         <tr>
-          <td style="padding:10px;text-align:center;"><img src="img/user_images/1625401000-orig.jpg" alt="" width="100" /></td>
+          <td style="padding:10px;text-align:center;">
+          @if($position["image"] != '')
+            <?php $image = ltrim($position["image"], $position["image"][0]); ?>
+            <img alt="" width="100" src="{{ $image }}" alt="" width="70"/>
+          @endif
+          </td>
           <td style="padding:10px;text-align:center;">{{ $position["id"] }}</td>
           <td style="padding:10px;text-align:center;">{{ $position["name"] }}</td>
           <td style="padding:10px;text-align:center;">{{ $position["father_name"] }}</td>

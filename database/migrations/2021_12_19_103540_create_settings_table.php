@@ -25,6 +25,7 @@ class CreateSettingsTable extends Migration
             $table->string('controller_name');
             $table->string('controller_image');
             $table->longText('controllers_message');
+            $table->string('controller_signature');
             $table->string('deputy_controller_name');
             $table->string('deputy_controller_signature');
             $table->timestamps();

@@ -876,7 +876,7 @@ class ImportExportsController extends Controller
 
     			$studentsexams = DB::connection('sqlite')->select('SELECT * FROM students_exams WHERE student_id = '.$student->id.';');
 
-    			if(count($studentsexam) > 0) {
+    			if(count($studentsexams) > 0) {
     				StudentsExam::where('student_id', $student->id)->delete();
 	    			foreach($studentsexams as $studentexam) {
 	    				$stdexam = new StudentsExam;

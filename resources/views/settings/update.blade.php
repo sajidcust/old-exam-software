@@ -102,6 +102,15 @@
                       <textarea id="summernote" name="controllers_message" class="summernote form-control" placeholder="Controllers message here.">{{ Request::old('controllers_message')!='' ? Request::old('controllers_message'):$setting->controllers_message }}</textarea>
                     </div>
                     <div class="form-group">
+                      <label for="exampleInputFileDepyteControllerSignature">Upload Controller's Signature Image<i class="fa fa-star-of-life required-label"></i></label>
+                      <div class="input-group">
+                        <div class="custom-file">
+                          <input type="file" class="custom-file-input exampleInputFile" id="exampleInputFileDepyteControllerSignature" name="controller_signature" accept="image/*">
+                          <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+                      </div> 
+                    </div>
+                    <div class="form-group">
                       <label for="labelInputDeputyControllerName">Deputy Controller's Name<i class="fa fa-star-of-life required-label"></i></i></label>
                       <input type="text" name="deputy_controller_name" class="form-control" id="labelInputDeputyControllerName" placeholder="Enter deputy controllers name" value="{{ Request::old('deputy_controller_name') != '' ? Request::old('deputy_controller_name') : $setting->deputy_controller_name }}">
                    </div>

@@ -5,6 +5,10 @@
 <title>Gazette Bar Graph Subject Wise Result Summary Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -69,7 +73,7 @@
                 //$pageText = "Page " . $plused_page . " of " . $PAGE_COUNT;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');
@@ -92,7 +96,7 @@
 <table style="width: 100%; border-collapse: collapse; border-style: none;" border="1">
 <tbody>
 <tr>
-<td style="width: 100%; border-style: none;"><img src="{{ $image_address }}" alt="" width="" height="" /></td>
+<td style="width: 100%; border-style: none;"><img src="{{ $image_address }}" alt="" width="900" height="500" /></td>
 </tr>
 </tbody>
 </table>

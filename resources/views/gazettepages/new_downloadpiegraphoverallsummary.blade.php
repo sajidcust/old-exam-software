@@ -5,6 +5,10 @@
 <title>Gazette Pie Graph Overall Result Summary Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -69,7 +73,7 @@
                 $size = 12;
                 $pageText = "Page " . $plused_page;
                 $y = 580;
-                $x = $pdf->get_width()-90;
+                $x = $pdf->get_width()-140;
                 $pdf->text($x, $y, $pageText, $font, $size);
             } 
         ');
@@ -97,7 +101,7 @@
 <tbody>
 <tr>
 <td style="width: 100%; border-style: none; text-align: center;" colspan="4">
-<h3>Overall Result</h3>
+<h3>Overall Result of Class {{ $standard->name }}</h3>
 </td>
 </tr>
 <tr>

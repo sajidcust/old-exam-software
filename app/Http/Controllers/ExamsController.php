@@ -887,7 +887,7 @@ class ExamsController extends Controller
                 $all_subs_added = true;
 
                 foreach($semesters as $semester) {
-                    FailedJob::where('payload', 'GZT-'.$student->roll_no.'-'.$semester_id)->delete();
+                    FailedJob::where('payload', 'GZT-'.$student->roll_no.'-'.$semester->id)->delete();
 
                     $se_count = StudentsExam::where('student_id', $student->roll_no)->where('semester_id', $semester->id)->count();
 
@@ -1198,7 +1198,7 @@ class ExamsController extends Controller
             $standard = Standard::find($class_id);
 
             $results = DB::select(DB::raw("
-                SELECT s.id, s.name, s.father_name, i.name AS institution_name, d.name AS district_name, g.total_obt_marks, ROUND((g.total_obt_marks/g.total_max_marks)*100, 2) AS marks_percentage
+                SELECT s.id, s.name, s.image, s.father_name, i.name AS institution_name, d.name AS district_name, g.total_obt_marks, ROUND((g.total_obt_marks/g.total_max_marks)*100, 2) AS marks_percentage
                     FROM students AS s
                     JOIN gazettes AS g
                     ON g.student_id = s.id
@@ -1230,6 +1230,7 @@ class ExamsController extends Controller
                     for($j=0; $j<$occurence; $j++){
                         $results_arr[$index][$j]['id'] = $results[$count+$j]->id;
                         $results_arr[$index][$j]['name'] = $results[$count+$j]->name;
+                        $results_arr[$index][$j]['image'] = $results[$count+$j]->image;
                         $results_arr[$index][$j]['father_name'] = $results[$count+$j]->father_name;
                         $results_arr[$index][$j]['institution_name'] = $results[$count+$j]->institution_name;
                         $results_arr[$index][$j]['district_name'] = $results[$count+$j]->district_name;
@@ -1281,6 +1282,32 @@ class ExamsController extends Controller
             $pdf = PDF::loadView('gazettepages.new_downloaddistrictwisepositionholders', $data);
 
             return $pdf->download('gazette_district_wise_position_holders_page-'.$session_id.'-'.$session->title.'-'.$standard->id.'-'.$standard->name.'.pdf');
+        }
+    }
+
+    public function districtwisetop10positionholders(Request $request){
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $page_no = $request->input('page_no');
+        $district_id = $request->input('district_id');
+
+        if($session_id && $class_id && $page_no && $district_id){
+
+            $session = Session::find($session_id);
+            $standard = Standard::find($class_id);
+            $district = District::find($district_id);
+
+            $data = [
+                'session'    => $session,
+                'standard'   => $standard,
+                'page_no'    => $page_no,
+                'district'  => $district,
+                'setting'    => Setting::find(1)
+            ];
+
+            $pdf = PDF::loadView('gazettepages.new_districtwisetop10positionholders', $data);
+
+            return $pdf->download('gazette_districtwise_top_ten_position_holders_page-'.$session_id.'-'.$session->title.'-'.$standard->id.'-'.$standard->name.'-'.$district->name.'.pdf');
         }
     }
 
@@ -1760,6 +1787,7 @@ class ExamsController extends Controller
 
         $data = [
             'students'     => $students,
+            'session'      => Session::find($session_id),
             'setting'     => Setting::find(1)
         ];
 
@@ -1833,6 +1861,7 @@ class ExamsController extends Controller
         $data = [
             'student'     => $student,
             'semesters'   => $semesters,
+            'session'     => Session::find($student->session_id),
             'setting'     => Setting::find(1)
         ];
 
@@ -1903,6 +1932,7 @@ class ExamsController extends Controller
 
         $data = [
             'student'     => $student,
+            'session'     => Session::find($student->session_id),
             'setting'     => Setting::find(1)
         ];
 
@@ -1970,6 +2000,7 @@ class ExamsController extends Controller
 
         $data = [
             'students'     => $students,
+            'session'      => Session::find($session_id),
             'setting'     => Setting::find(1)
         ];
 
@@ -2440,7 +2471,7 @@ class ExamsController extends Controller
         $center_id = $request->input('center_id');
         $subject_id = $request->input('subject_id');
 
-        $students = Student::where('session_id', $session_id)->where('class_id', $class_id)->where('center_id', $center_id)->get(['id', 'name']);
+        $students = Student::join('students_subjects', 'students_subjects.student_id', '=', 'students.id')->where('students_subjects.subject_id', $subject_id)->where('session_id', $session_id)->where('class_id', $class_id)->where('center_id', $center_id)->get(['students.id', 'students.name']);
 
         $subject = Subject::find($subject_id);
         $semester = Semester::find($semester_id);

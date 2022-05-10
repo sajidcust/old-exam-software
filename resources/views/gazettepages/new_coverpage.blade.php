@@ -5,6 +5,10 @@
 <title>Gazette Cover Page {{ $session->title }} - {{ $standard->name }}</title>
 
 <style type="text/css">
+    body{
+        margin-left: 4cm;
+        margin-right: 2cm;
+    }
     * {
         font-family: Verdana, Arial, sans-serif;
     }
@@ -113,7 +117,7 @@
 <tbody>
 <tr style="height: 73px;">
 <td style="width: 20%; height: 73px; border-style: none; text-align: center; font-weight: bold;">
-<h4>PH# 05811-92088</h4>
+<h4>PH# 05811-940888</h4>
 </td>
 <td style="width: 60%; height: 73px; border-style: none; text-align: right; font-weight: bold;">
 </td>
