@@ -94,9 +94,9 @@
                               <option value="">Select Center</option> 
                               @foreach($centers as $center)
                                   @if($center->id == Request::old('center_id'))
-                                      <option selected value="{{ $center->id }}">{{ $center->name }}</option>
+                                      <option selected value="{{ $center->id }}">{{ $center->id. " - ". $center->name }}</option>
                                   @else
-                                      <option value="{{ $center->id }}">{{ $center->name }}</option>
+                                      <option value="{{ $center->id }}">{{ $center->id. " - ". $center->name }}</option>
                                   @endif
                               @endforeach
                           </select>

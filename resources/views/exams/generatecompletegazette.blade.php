@@ -568,6 +568,46 @@
               </form>
 
               <div class="card-header">
+                <h3 class="card-title"><strong>Print Centerwise Gazette</strong></h3>
+              </div>
+              <!-- form start -->
+              <form id="quickForm_print_centerwise_gazette" method="post" action="{{ route('exams.printcenterwisegazettewithpages') }}">
+                {{ csrf_field() }}
+                <input type="hidden" name="session_id" value="{{ $session_id }}">
+                <input type="hidden" name="class_id" value="{{ $class_id }}">
+
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="labelInputPageNo">Previous Page No<i class="fa fa-star-of-life required-label"></i></i></label>
+                        <input type="number" name="page_no" class="form-control" id="labelInputPageNo" placeholder="Enter page no" value="">
+                       </div>
+                      </div>
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <label for="labelInputCenter">Center<i class="fa fa-star-of-life required-label"></i></label>
+                          <select class="custom-select rounded-0 select2" id="labelInputCenter" name="center_id">
+                              <option value="">Select a center</option> 
+                              @foreach($centers as $center)
+                                @if($center->id == Request::old('center_id'))
+                                    <option selected value="{{ $center->id }}">{{ $center->id. " - ". $center->name }}</option>
+                                @else
+                                    <option value="{{ $center->id }}">{{ $center->id. " - ". $center->name }}</option>
+                                @endif
+                              @endforeach
+                          </select>
+                       </div>
+                      </div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                  <input id="submitBtn" type="submit" class="btn btn-success" value="Download">
+                </div>
+              </form>
+
+              <div class="card-header">
                 <h3 class="card-title"><strong>Print Table of Contents</strong></h3>
               </div>
               <!-- form start -->
@@ -604,6 +644,10 @@
                   <div class="form-group">
                       <label for="labelInputOverallTop10PositionHoldersPageNo">Page No For Overall Top 10 Positions<i class="fa fa-star-of-life required-label"></i></i></label>
                       <input type="number" name="overall_top_ten_position_holders_page_no" class="form-control" id="labelInputOverallTop10PositionHoldersPageNo" placeholder="Enter Page No For Overall Top 10 Positions" value="">
+                  </div>
+                  <div class="form-group">
+                      <label for="labelInputOverallTop10PositionHoldersPageNo">Page No For Districtwise Top 10 Position Holders First Page<i class="fa fa-star-of-life required-label"></i></i></label>
+                      <input type="number" name="districtwise_top_ten_position_holders_page_no" class="form-control" id="labelInputDistrictwiseTop10PositionHoldersPageNo" placeholder="Enter Page No For Districtwise Top 10 Positions First Page" value="">
                   </div>
                   <div class="form-group">
                       <label for="labelInputOverallResultPieGraphSummaryPageNo">Page No For Overall Pie Graph Summary<i class="fa fa-star-of-life required-label"></i></i></label>
@@ -662,6 +706,34 @@
           minStrict:true
         },
         district_id: {
+          required: true
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+        $(element).removeClass('is-valid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+        $(element).addClass('is-valid');
+      },
+      submitHandler: function(form) {
+        form.submit();
+      }
+   });
+
+  var validatevar = $('#quickForm_print_centerwise_gazette').validate({
+      rules: {
+        page_no: {
+          required: true,
+          number: true
+        },
+        center_id: {
           required: true
         }
       },
@@ -1149,6 +1221,13 @@
           }
       });
     });
+  });
+
+
+  $('.select2').select2({
+      theme: 'bootstrap4'
+  }).change(function(){
+      $('#quickForm').valid();
   });
 </script>
 

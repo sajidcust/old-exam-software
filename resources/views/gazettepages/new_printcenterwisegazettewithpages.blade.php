@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gazette {{ $session->title }} - {{ $standard->name }} - {{ $district->name }}</title>
+<title>Gazette {{ $session->title }} - {{ $standard->name }} - {{ $center->name }}</title>
 
 <style type="text/css">
     body{
@@ -36,11 +36,10 @@
 
     @page { size: legal landscape; }
 
-    /*table.GeneratedTable {
+    table.GeneratedTable {
       width: 100%;
       background-color: #ffffff;
-      border-collapse: separate;
-      border-spacing: 0.02cm;
+      border-collapse: collapse;
       border-width: 1px;
       border-color: #000000;
       border-style: solid;
@@ -56,14 +55,13 @@
 
     table.GeneratedTable thead {
       background-color: #ffffff;
-    }*/
+    }
 
     .page_break { page-break-before: always; }
 </style>
 
 </head>
 <body>
-  @include('gazettepages.new_coverpage_district', array('session' => $session, 'standard'=>$standard, 'district'=>$district, 'setting'=>$setting))
 
   <script type="text/php">
       if ( isset($pdf) ) {
@@ -83,8 +81,7 @@
       }
   </script>
 
-  @if($district)
-  <?php App\Models\TableOfContent::where("session_id", $session->id)->where("class_id", $standard->id)->where("district_id", $district->id)->delete(); ?>
+  @if($center)
       <table width="100%">
         <thead>
           <tr>
@@ -95,8 +92,8 @@
         </thead>
       </table>
 
-      <?php $centers = App\Models\StudentsExam::getCenters($session->id, $standard->id, $district->id); ?>
-      @if(count($centers)>0)
+      <?php //$centers = App\Models\StudentsExam::getCenters($session->id, $standard->id, $district->id); ?>
+      @if(1)
 
       <?php
 
@@ -114,26 +111,7 @@
 
       ?>
 
-        @foreach($centers as $center)
-
-        <script type="text/php">
-
-          $session_id = (int)"<?php echo $session->id; ?>";
-          $standard_id = (int)"<?php echo $standard->id; ?>";
-          $district_id = (int)"<?php echo $district->id; ?>";
-          $center_id = (int)"<?php echo $center->id; ?>";
-
-          App\Models\TableOfContent::where("session_id", $session_id)->where("class_id", $standard_id)->where("district_id", $district_id)->where("center_id", $center_id)->delete();
-
-          $table_of_content = new App\Models\TableOfContent;
-          $table_of_content->session_id = $session_id;
-          $table_of_content->class_id = $standard_id;
-          $table_of_content->district_id = $district_id;
-          $table_of_content->center_id = $center_id;
-          $table_of_content->page_no = $pdf->get_page_number()+(int)"<?php echo $page_no; ?>";
-          $table_of_content->save();
-
-        </script>
+        @if($center)
         
 
         <?php
@@ -151,7 +129,7 @@
 
         ?>
 
-        <?php $gazettes = App\Models\StudentsExam::getGazettes($session->id, $district->id, $center->id, $standard->id); ?>
+        <?php $gazettes = App\Models\StudentsExam::getGazettesForCenter($session->id, $center->id, $standard->id); ?>
 
           @if(count($gazettes)>0)
             <table width="100%">
@@ -169,7 +147,7 @@
               </thead>
             </table>
 
-            <table border="1" style="border-collapse:separate;border-spacing: 0cm;" class="GeneratedTable" width="100%">
+            <table class="GeneratedTable" width="100%">
               <thead>
                 <?php $subjects = App\Models\StudentsExam::getSubjectsCombined($session->id, $center->id, $standard->id); ?>
                 <tr>
@@ -355,75 +333,8 @@
             $g_total_f += $total_f;
 
           ?>
-
-        @endforeach
+        @endif
       @endif
-
-      <h4 style="font-size:15px;text-align: center; margin-bottom: 5px;">District {{ $district->name }}, Combined Result Summary</h4>
-      <table style="border-collapse: collapse; width: 100%;margin-bottom:5px;" border="1">
-      <tbody>
-      <tr>
-      <td style="width: 12.5%; text-align: left;font-size:10px;">TOTAL:</td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;"><strong><strong>{{ $g_total_students }}</strong></td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;">PASS:</td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;"><strong>{{ $g_pass_students }}</td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;">PROMOTED:</td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;"><strong><strong>{{ $g_promoted_students }}</strong></td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;">REAPPEAR</td>
-      <td style="width: 12.5%; text-align: left;font-size:10px;"><strong><strong>{{ $g_reappear_students }}</strong></td>
-      </tr>
-      <tr>
-      <td style="font-size:10px;width: 25%; text-align: left;" colspan="2">PERCENTAGE:</td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;">PASS %:</td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;"><strong>
-      @if($g_pass_students != 0)
-         {{ round((($g_pass_students/$g_total_students)*100), 2) }}
-      @else
-        0.00
-      @endif
-      </strong>
-      </td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;">PROMOTED %:</td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;"><strong>
-      @if($g_promoted_students != 0)
-        {{ round((($g_promoted_students/$g_total_students)*100), 2) }}
-      @else
-        0.00
-      @endif
-      </strong>
-      </td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;">REAPPEAR %</td>
-      <td style="font-size:10px;width: 12.5%; text-align: left;"><strong>
-      @if($g_reappear_students != 0)
-        {{ round((($g_reappear_students/$g_total_students)*100), 2) }}
-      @else
-        0.00
-      @endif
-      </strong>
-      </td>
-      </tr>
-      </tbody>
-      </table>
-      <table style="width: 100%; margin-bottom: 10px; border-collapse: collapse; border-style: none;" border="1">
-      <tbody>
-      <tr>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">A+:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_a_plus }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">A:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_a }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">B:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_b }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">C:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_c }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">D:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_d }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">E:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_e }}</strong></td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;">F:</td>
-      <td style="font-size:10px;width: 7.14%; text-align: center;"><strong>{{ $g_total_f }}</strong></td>
-      </tr>
-      </tbody>
-      </table>
     
   @endif
 

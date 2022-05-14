@@ -146,6 +146,15 @@
           <?php $i++; ?>
         @endif
 
+        @if($districtwise_top_ten_position_holders_page_no != NULL || $districtwise_top_ten_position_holders_page_no != '')
+          <tr>
+            <td style="width: 7.96947%; text-align: center;">{{ $i }}</td>
+            <td style="padding-left:10px; width: 79.695%;">DISTRICTWISE TOP TEN POSITION HOLDERS OF {{ strtoupper($standard->name) }}</td>
+            <td style="width: 12.3354%; text-align: center;">{{ $districtwise_top_ten_position_holders_page_no }}</td>
+          </tr>
+          <?php $i++; ?>
+        @endif
+
         @if($pie_graph_overall_result_summary_page_no != NULL || $pie_graph_overall_result_summary_page_no != '')
           <tr>
             <td style="width: 7.96947%; text-align: center;">{{ $i }}</td>

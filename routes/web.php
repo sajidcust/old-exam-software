@@ -212,6 +212,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'isadmin'], function () {
 	Route::post('/exams/downloadsubjectwiseresultpercentage', [ExamsController::class, 'downloadsubjectwiseresultpercentage'])->name('exams.downloadsubjectwiseresultpercentage');
 	Route::post('/exams/bargraphsubjectwisedistrictsummary', [ExamsController::class, 'bargraphsubjectwisedistrictsummary'])->name('exams.bargraphsubjectwisedistrictsummary');
 	Route::post('/exams/printcompletegazettewithpages', [ExamsController::class, 'printcompletegazettewithpages'])->name('exams.printcompletegazettewithpages');
+	Route::post('/exams/printcenterwisegazettewithpages', [ExamsController::class, 'printcenterwisegazettewithpages'])->name('exams.printcenterwisegazettewithpages');
 	Route::post('/exams/districtwisetop10positionholders', [ExamsController::class, 'districtwisetop10positionholders'])->name('exams.districtwisetop10positionholders');
 	Route::post('/exams/generatetableofcontents', [ExamsController::class, 'generatetableofcontents'])->name('exams.generatetableofcontents');
 

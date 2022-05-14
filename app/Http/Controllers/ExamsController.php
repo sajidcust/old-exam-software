@@ -771,11 +771,13 @@ class ExamsController extends Controller
         $class_id = $request->input('class_id');
 
         $districts = District::all();
+        $centers = Institution::where('is_center', 1)->get();
 
         return view('exams.generatecompletegazette')
             ->with('session_id', $session_id)
             ->with('class_id', $class_id)
             ->with('districts', $districts)
+            ->with('centers', $centers)
             ->with('main_title', $this->main_title)
             ->with('selected_main_menu', $this->selected_main_menu)
             ->with('breadcrumb_title', $this->breadcrumb_title)
@@ -1261,6 +1263,7 @@ class ExamsController extends Controller
     }
 
     public function downloaddistrictwisepositionholders(Request $request){
+        ini_set('max_execution_time', 50000);
         $session_id = $request->input('session_id');
         $class_id = $request->input('class_id');
         $page_no = $request->input('page_no');
@@ -1286,6 +1289,7 @@ class ExamsController extends Controller
     }
 
     public function districtwisetop10positionholders(Request $request){
+        ini_set('max_execution_time', 50000);
         $session_id = $request->input('session_id');
         $class_id = $request->input('class_id');
         $page_no = $request->input('page_no');
@@ -1312,6 +1316,7 @@ class ExamsController extends Controller
     }
 
     public function overalltoptenpositionholders(Request $request){
+        ini_set('max_execution_time', 50000);
         $session_id = $request->input('session_id');
         $class_id = $request->input('class_id');
         $page_no = $request->input('page_no');
@@ -1346,6 +1351,7 @@ class ExamsController extends Controller
         $top_position_holders_page_no = $request->input('top_position_holders_page_no');
         $top_district_wise_position_holders_page_no = $request->input('top_district_wise_position_holders_page_no');
         $overall_top_ten_position_holders_page_no = $request->input('overall_top_ten_position_holders_page_no');
+        $districtwise_top_ten_position_holders_page_no = $request->input('districtwise_top_ten_position_holders_page_no');
         $pie_graph_overall_result_summary_page_no = $request->input('pie_graph_overall_result_summary_page_no');
         $bar_graph_districtwise_result_summary_page_no = $request->input('bar_graph_districtwise_result_summary_page_no');
         $bar_graph_subjectwise_result_summary_page_no = $request->input('bar_graph_subjectwise_result_summary_page_no');
@@ -1367,6 +1373,7 @@ class ExamsController extends Controller
                 'top_position_holders_page_no' => $top_position_holders_page_no,
                 'top_district_wise_position_holders_page_no' => $top_district_wise_position_holders_page_no,
                 'overall_top_ten_position_holders_page_no' => $overall_top_ten_position_holders_page_no,
+                'districtwise_top_ten_position_holders_page_no' => $districtwise_top_ten_position_holders_page_no,
                 'pie_graph_overall_result_summary_page_no' => $pie_graph_overall_result_summary_page_no,
                 'bar_graph_districtwise_result_summary_page_no' => $bar_graph_districtwise_result_summary_page_no,
                 'bar_graph_subjectwise_result_summary_page_no' => $bar_graph_subjectwise_result_summary_page_no,
@@ -1521,6 +1528,38 @@ class ExamsController extends Controller
             $pdf = PDF::loadView('gazettepages.new_printcompletegazettewithpages', $data);
 
             return $pdf->download('complete gazettes_by_districts-'.$session_id.'-'.$session->title.'-'.$standard->id.'-'.$standard->name. '-'.$district->name.'.pdf');
+        }
+
+    }
+
+    public function printcenterwisegazettewithpages(Request $request){
+        $session_id = $request->input('session_id');
+        $class_id = $request->input('class_id');
+        $center_id = $request->input('center_id');
+        $page_no = $request->input('page_no');
+
+        //$center = Institution::find($center_id);
+        $center = Institution::join('tehsils', 'tehsils.id', '=', 'institutions.tehsil_id')->join('districts', 'districts.id', '=', 'tehsils.district_id')->where('institutions.id', $center_id)->first(['institutions.*', DB::raw('districts.name as district_name')]);
+
+        @ini_set('max_execution_time', 5000);
+
+        if($session_id && $class_id) {
+            $session = Session::find($session_id);
+            $standard = Standard::find($class_id);
+
+            $data = [
+                'session'       => $session,
+                'standard'      => $standard,
+                'page_no'       => $page_no,
+                'center'        => $center,
+                'setting'       => Setting::find(1)
+            ];
+
+            @ini_set('memory_limit', '-1');
+
+            $pdf = PDF::loadView('gazettepages.new_printcenterwisegazettewithpages', $data);
+
+            return $pdf->download('complete gazettes_by_centers-'.$session_id.'-'.$session->title.'-'.$standard->id.'-'.$standard->name. '-'.$center->name.'.pdf');
         }
 
     }

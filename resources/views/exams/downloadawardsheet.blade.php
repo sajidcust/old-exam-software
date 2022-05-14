@@ -32,7 +32,7 @@
 
     @page { size: a4 portrait; }
 
-    table.GeneratedTable {
+    /*table.GeneratedTable {
       width: 100%;
       background-color: #ffffff;
       border-collapse: collapse;
@@ -51,7 +51,7 @@
 
     table.GeneratedTable thead {
       background-color: #ffffff;
-    }
+    }*/
 
     .page_break { page-break-before: always; }
 </style>
@@ -110,7 +110,7 @@
           </tbody>
         </table>
 
-        <table class="GeneratedTable">
+        <table border="1" style="border-collapse: separate; border-spacing: 0cm;" class="GeneratedTable">
           <thead>
             <tr>
               <th>S. No</th>
@@ -142,13 +142,12 @@
             @endforeach
           </tbody>
         </table> 
-        <br><br><br><br>
         <table width="100%">
           <thead width="100%">
             <tr width="100%">
-              <td style="text-align: left;font-weight: bold;" width="33">Signature of Superintendent</td>
-              <td style="text-align: center;font-weight: bold;" width="30">Signature of Examiner</td>
-              <td style="text-align: right;font-weight: bold;" width="37">Signature of Head Examiner</td>
+              <td style="text-align: left;font-weight: bold;" width="35%" height="70" valign="bottom">Signature of Superintendent</td>
+              <td align="center" style="text-align: center;font-weight: bold;" width="30%" height="70" valign="bottom">Signature of Examiner</td>
+              <td style="text-align: right;font-weight: bold;" width="35%" height="70" valign="bottom">Signature of Head Examiner</td>
             </tr>
           </thead>
         </table>

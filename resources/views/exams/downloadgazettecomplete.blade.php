@@ -32,7 +32,7 @@
 
     @page { size: legal landscape; }
 
-    table.GeneratedTable {
+    /*table.GeneratedTable {
       width: 100%;
       background-color: #ffffff;
       border-collapse: collapse;
@@ -51,7 +51,7 @@
 
     table.GeneratedTable thead {
       background-color: #ffffff;
-    }
+    }*/
 
     .page_break { page-break-before: always; }
 </style>
@@ -102,7 +102,7 @@
               </thead>
             </table>
 
-            <table class="GeneratedTable" width="100%">
+            <table border="1" style="border-collapse:collapse;" class="GeneratedTable" width="100%">
               <thead>
                 <?php $subjects = App\Models\StudentsExam::getSubjectsCombined($session->id, $center->id, $standard->id); ?>
                 <tr>

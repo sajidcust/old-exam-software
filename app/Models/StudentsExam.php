@@ -54,6 +54,21 @@ class StudentsExam extends Model
         return $institutions;
     }
 
+    public static function getGazettesForCenter($session_id, $center_id, $standard_id){
+
+        if(DB::connection()->getDriverName() == 'mysql') {
+            $date_of_birth = "DATE_FORMAT(students.date_of_birth, '%d-%m-%Y') AS date_of_birth";
+        }
+
+        if(DB::connection()->getDriverName() == 'sqlite') {
+            $date_of_birth = "strftime('%d-%m-%Y', students.date_of_birth) AS date_of_birth";
+        }
+
+        $gazettes = Gazette::join('institutions', 'institutions.id', '=', 'gazettes.institution_id')->join('students', 'students.id', '=', 'gazettes.student_id')->where('gazettes.session_id', $session_id)->where('gazettes.center_id', $center_id)->where('gazettes.class_id', $standard_id)->orderBy('students.id', 'ASC')->get(['students.id', DB::raw('institutions.name AS institution_name'), 'students.name', 'students.father_name', DB::raw($date_of_birth), 'gazettes.total_obt_marks', 'gazettes.total_max_marks', 'gazettes.percentage_marks', 'gazettes.grade', 'gazettes.result']);
+
+        return $gazettes;
+    }
+
     public static function getGazettes($session_id, $district_id, $center_id, $standard_id){
 
         if(DB::connection()->getDriverName() == 'mysql') {
@@ -306,16 +321,16 @@ class StudentsExam extends Model
         $results = DB::select(DB::raw("
                     SELECT d.id, d.name,
                     (
-                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.session_id = g.session_id
+                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.session_id = g.session_id AND gazettes.class_id = ".$standard_id."
                     ) AS total_students_appeared,
                     (
-                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 0 AND gazettes.session_id = g.session_id
+                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 0 AND gazettes.session_id = g.session_id AND gazettes.class_id = ".$standard_id."
                     ) AS pass_students,
                     (
-                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 1 AND gazettes.session_id = g.session_id
+                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 1 AND gazettes.session_id = g.session_id AND gazettes.class_id = ".$standard_id."
                     ) AS promoted_students,
                     (
-                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 2 AND gazettes.session_id = g.session_id
+                        SELECT COUNT(gazettes.result) FROM gazettes WHERE gazettes.district_id = g.district_id AND gazettes.result = 2 AND gazettes.session_id = g.session_id AND gazettes.class_id = ".$standard_id."
                     ) AS reappear_students
                     FROM gazettes g
                     JOIN districts d
@@ -387,6 +402,7 @@ class StudentsExam extends Model
                     GROUP BY s.id;
                 "), array('session_id'=>$session_id, 'standard_id'=>$standard_id));
 
+        //dd($results);
         $percentages_arr = array();
 
         $percentages_arr['cols'][] = array('label' => 'Subjects', 'type' => 'string');
