@@ -89,53 +89,12 @@ class FeesController extends Controller
     }
 
     public function downloadcompletefeereport($id){
-        if($id){
-
-            $session = Session::find($id);
-
-            $institutions = Student::join('students_fees', 'students_fees.student_id', '=', 'students.id')->join('institutions', 'institutions.id', '=', 'students.institution_id')->where('students.session_id', $id)->groupBy('institutions.id')->get(['institutions.id', 'institutions.name', DB::raw('SUM(students_fees.total_amount) AS total_amount')]);
-
-            $data = [
-                'session'    => $session,
-                'institutions'=> $institutions,
-            ];
-
-            ini_set('max_execution_time', 5000);
-            ini_set('memory_limit', '-1');
-
-            $pdf = PDF::loadView('fees.downloadcompletefeereport', $data);
-
-            return $pdf->download('complete_fee_report-'.$session->id.'-'.$session->title.'.pdf');
-        }
+        
     }
 
     public function downloadfeereport($id, $session_id){
 
-        if($id && $session_id){
-
-            $session = Session::find($session_id);
-            $institution = Institution::find($id);
-
-            if(DB::connection()->getDriverName() == 'mysql') {
-                $date_of_deposit = "DATE_FORMAT(students_fees.date_of_deposit, '%d-%m-%Y') AS date_of_deposit";
-            }
-
-            if(DB::connection()->getDriverName() == 'sqlite') {
-                $date_of_deposit = "strftime('%d-%m-%Y', students_fees.date_of_deposit) AS date_of_deposit";
-            }
-
-            $students = Student::join('students_fees', 'students_fees.student_id', '=', 'students.id')->join('banks', 'banks.id', '=', 'students_fees.bank_id')->where('students.session_id', $session_id)->where('students.institution_id', $id)->get(['students.id', 'students.name', DB::raw('banks.name AS bank_name'), 'students_fees.semester_id', 'students_fees.challan_no', DB::raw($date_of_deposit), 'students_fees.total_amount']);
-
-            $data = [
-                'session'    => $session,
-                'institution'=> $institution,
-                'students'   => $students
-            ];
-
-            $pdf = PDF::loadView('fees.downloadfeereportbyinstitution', $data);
-
-            return $pdf->download('fee_report-'.$session_id.'-'.$session->title.'-'.$institution->id.'-'.$institution->name.'.pdf');
-        }
+        
     }
 
     public function generatefeedetails(){
