@@ -1,13 +1,10 @@
 <?php
 
 namespace App\Exports;
-
 use App\Models\User;
 use App\Models\Nomination;
 use App\Models\StudentAcademicQualification;
 use App\Models\NominationPrequalification;
-
-
 use Maatwebsite\Excel\Concerns\FromCollection;
 //use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;

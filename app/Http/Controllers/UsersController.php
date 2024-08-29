@@ -17,15 +17,16 @@ class UsersController extends Controller
     protected $page_title = "Board of Elementary Examination, Gilgit Baltistan | Users";
 
 	public function index(){
-        if(auth()->user()) {
-            if(auth()->user()->user_role == 1){
-    		    return redirect()->to('/admin/dashboard');
-            } else if(auth()->user()->user_role == 2){
-                return redirect()->to('/assessmentcenter/index');
-            } else {
-                return redirect()->to('/dataentry/index');
-            }
-        }
+
+//        if(auth()->user()) {
+//            if(auth()->user()->user_role == 1){
+//    		    return redirect()->to('/admin/dashboard');
+//            } else if(auth()->user()->user_role == 2){
+//                return redirect()->to('/assessmentcenter/index');
+//            } else {
+//                return redirect()->to('/dataentry/index');
+//            }
+//        }
 
         $this->page_title = "Board of Elementary Examination, Gilgit Baltistan | User Login";
 
@@ -135,13 +136,13 @@ class UsersController extends Controller
             ]);
         }
 
-        if(auth()->user()->user_role == 1){
+//        if(auth()->user()->user_role == 1){
             return redirect()->to('admin/dashboard');
-        } else if(auth()->user()->user_role == 2) {
-            return redirect()->to('assessmentcenter/index')->with('message', 'Hi '. auth()->user()->name. ', Thanks for signing in.');
-        } else{
-            return redirect()->to('dataentry/index')->with('message', 'Hi '. auth()->user()->name. ', Thanks for signing in.');
-        }
+//        } else if(auth()->user()->user_role == 2) {
+//            return redirect()->to('assessmentcenter/index')->with('message', 'Hi '. auth()->user()->name. ', Thanks for signing in.');
+//        } else{
+//            return redirect()->to('dataentry/index')->with('message', 'Hi '. auth()->user()->name. ', Thanks for signing in.');
+//        }
 
         
 	}

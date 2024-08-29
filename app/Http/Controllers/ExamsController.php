@@ -555,11 +555,9 @@ class ExamsController extends Controller
 
     public function downloaddetailedmarksheet($id){
 
-        
     }
 
     public function downloadmarksheet($id) {
-
         
     }
 

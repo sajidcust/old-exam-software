@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class DataEntryController extends Controller
 {
-    protected $page_title = "Directorate of Education Colleges GB | Dashboard";
+    protected $page_title = "Board of Elementary Examination, GB | Dashboard";
     protected $main_title = "Dashboard";
     protected $breadcrumb_title = "Dashboard";
     protected $selected_main_menu = "data_entry_dashboard";

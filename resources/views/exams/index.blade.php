@@ -171,21 +171,21 @@
 		    	'copy',
 		    	{
 	                extend: 'csvHtml5',
-	                title: 'Directorate Of Education MIS System (CSV-Format)',
+	                title: 'Board Elementary Examination, GB System (CSV-Format)',
 	                exportOptions: {
 	                    columns: ':visible'
 	                }
 	            },
 	            {
 	                extend: 'excelHtml5',
-	                title: 'Directorate Of Education MIS System, (Excel-Format)',
+	                title: 'Board Elementary Examination, GB System, (Excel-Format)',
 	                exportOptions: {
 	                    columns: ':visible'
 	                }
 	            },
 	            {
 	                extend: 'pdfHtml5',
-	                title: 'Directorate Of Education MIS System, (PDF-Format)',
+	                title: 'Board Elementary Examination, GB MIS System, (PDF-Format)',
 	                exportOptions: {
 	                    columns: ':visible'
 	                },
@@ -195,7 +195,7 @@
 	            },
 	            {
 	                extend: 'print',
-	                title: 'Directorate Of Education MIS System, (Print-Format)',
+	                title: 'Board Elementary Examination, GB MIS System, (Print-Format)',
 	                exportOptions: {
 	                    columns: ':visible'
 	                },

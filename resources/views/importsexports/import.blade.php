@@ -1,6 +1,5 @@
 @extends('layouts.main')
 
-
 @section('content')
   <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -30,7 +29,7 @@
               <div class="card-header row">
                 <div class="col-lg-12">
                   <h3 class="card-title custom-card-title">{{ $card_title }} (Students)</h3>
-                </div>
+               </div>
               </div>
               <!-- /.card-header -->
                 @if($errors->any())
